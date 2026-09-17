@@ -183,6 +183,46 @@ body{background:#0A0A0B}
     </div>
   </div>
 
+  <!-- Customer Accounts Manager (for you as owner) - visible at ?admin=1 -->
+  <div id="customerManager" class="hidden fixed inset-0 z-[60] overflow-auto bg-[#0A0A0B]/90 backdrop-blur-md p-6">
+    <div class="mx-auto max-w-[700px] rounded-[20px] bg-[#121214] border border-white/[0.08] p-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-[18px] font-bold">👥 Customer Accounts Manager — $49/mo SaaS</h2>
+        <button onclick="document.getElementById('customerManager').classList.add('hidden')" class="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center">✕</button>
+      </div>
+      <p class="mt-2 text-[12px] text-zinc-500">Create account for each customer. Generates license key + access link. For Systeme.io, accounts auto-create after payment — this is for manual license keys.</p>
+      
+      <div class="mt-5 p-4 rounded-xl bg-[#0F0F10] border border-white/[0.06] space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-[11px] text-zinc-400">Customer Email</label><input id="custEmail" placeholder="john@example.com" class="mt-1 w-full h-10 px-3 rounded-lg bg-[#121214] border border-white/[0.08] text-[13px]"/></div>
+          <div><label class="text-[11px] text-zinc-400">Customer Name</label><input id="custName" placeholder="John Doe" class="mt-1 w-full h-10 px-3 rounded-lg bg-[#121214] border border-white/[0.08] text-[13px]"/></div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-[11px] text-zinc-400">Plan</label><select id="custPlan" class="mt-1 w-full h-10 px-3 rounded-lg bg-[#121214] border border-white/[0.08] text-[13px]"><option>$49/mo Pro</option><option>$149/mo Agency</option><option>$29/mo Starter</option></select></div>
+          <div><label class="text-[11px] text-zinc-400">Tag (for Systeme.io)</label><input id="custTag" placeholder="paid-pro" value="paid-pro" class="mt-1 w-full h-10 px-3 rounded-lg bg-[#121214] border border-white/[0.08] text-[13px]"/></div>
+        </div>
+        <button id="generateAccountBtn" class="w-full h-11 rounded-full bg-white text-black font-semibold text-[13px]">Generate License + Access Link →</button>
+        
+        <div id="generatedAccount" class="hidden mt-4 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 space-y-2">
+          <div class="text-[11px] font-mono text-emerald-300 uppercase">✅ Account Created</div>
+          <div><label class="text-[11px] text-zinc-400">License Key (customer enters in paywall)</label><div class="mt-1 flex gap-2"><input id="genLicense" readonly class="flex-1 h-10 px-3 rounded-lg bg-[#0F0F10] border border-emerald-500/20 text-[12px] font-mono text-emerald-300"/><button onclick="navigator.clipboard.writeText(document.getElementById('genLicense').value); showToast('Copied license key')" class="px-4 h-10 rounded-full bg-emerald-600 text-white text-[11px] font-semibold">Copy</button></div></div>
+          <div><label class="text-[11px] text-zinc-400">Access Link (send to customer)</label><div class="mt-1 flex gap-2"><input id="genLink" readonly class="flex-1 h-10 px-3 rounded-lg bg-[#0F0F10] border border-emerald-500/20 text-[11px] font-mono text-zinc-300"/><button onclick="navigator.clipboard.writeText(document.getElementById('genLink').value); showToast('Copied access link')" class="px-4 h-10 rounded-full bg-emerald-600 text-white text-[11px] font-semibold">Copy</button></div></div>
+          <div><label class="text-[11px] text-zinc-400">Email Template (copy-paste to customer)</label><textarea id="genEmail" readonly rows="6" class="mt-1 w-full p-3 rounded-xl bg-[#0F0F10] border border-emerald-500/20 text-[11px] leading-[1.6] text-zinc-300"></textarea><button onclick="navigator.clipboard.writeText(document.getElementById('genEmail').value); showToast('Copied email template')" class="mt-2 w-full h-9 rounded-full bg-white/[0.06] border border-white/[0.08] text-[11px]">Copy Email Template</button></div>
+        </div>
+      </div>
+
+      <div class="mt-5">
+        <h3 class="text-[12px] font-semibold">Existing Customer Accounts (local)</h3>
+        <div id="customerList" class="mt-2 space-y-2 max-h-[200px] overflow-auto"></div>
+      </div>
+
+      <div class="mt-5 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+        <h4 class="text-[12px] font-semibold text-blue-300">💡 Systeme.io Auto-Accounts (Recommended)</h4>
+        <p class="mt-1 text-[11px] leading-[1.5] text-zinc-400">If you use Systeme.io checkout for $49/mo, you DON'T need manual accounts — Systeme.io auto-creates account after payment. Go to Systeme.io → Contacts → See all paid customers. To manually create in Systeme.io: Contacts → Add Contact → Email → Tag: paid-pro → Memberships → Grant access to LeadHunter Pro.</p>
+      </div>
+    </div>
+  </div>
+
 </div>
 </div>
 </div>
@@ -431,6 +471,78 @@ function updateFreeBadges(){
   }
 }
 
+function generateCustomerAccount(){
+  const email = document.getElementById('custEmail')?.value.trim();
+  const name = document.getElementById('custName')?.value.trim() || email?.split('@')[0] || 'Customer';
+  const plan = document.getElementById('custPlan')?.value || '$49/mo Pro';
+  const tag = document.getElementById('custTag')?.value.trim() || 'paid-pro';
+  if(!email){ showToast('Enter customer email'); return; }
+  const rand = Math.random().toString(36).slice(2,8);
+  const license = `pro-${email}-${rand}`.toLowerCase();
+  const accessLink = `https://fatahsystem7-glitch.github.io/lead-capture-agency/?access=pro&email=${encodeURIComponent(email)}&license=${encodeURIComponent(license)}`;
+  const emailTemplate = `Subject: Your LeadHunter Pro access — $49/mo activated
+
+Hi ${name},
+
+Your Pro account is ready! 🎉
+
+Plan: ${plan}
+License Key: ${license}
+Access Link: ${accessLink}
+
+How to access:
+1. Click access link above (auto-unlocks Pro)
+2. If paywall shows, paste license key: ${license} and click Unlock
+3. You now have unlimited hunts on 12 APIs: Reddit, HN, StackOverflow, Dev.to, Hashnode, Lobste.rs, GitHub, YouTube, Twitter, Quora, Product Hunt, Indie Hackers
+
+Your features:
+✓ Unlimited hunts
+✓ 12 Q&A sources
+✓ Save leads + Export CSV
+✓ Systeme.io auto-push with tag: ${tag}
+✓ Outreach generator
+
+Save this email — your license works while subscribed.
+
+Need help? Reply to this email.
+
+- LeadHunter Team
+
+P.S. Your login for Systeme.io (if you use it): https://app.systeme.io/login — Username: ${email}
+`;
+
+  document.getElementById('genLicense').value = license;
+  document.getElementById('genLink').value = accessLink;
+  document.getElementById('genEmail').value = emailTemplate;
+  document.getElementById('generatedAccount').classList.remove('hidden');
+
+  // Save to local customer list
+  let customers = JSON.parse(localStorage.getItem('leadhunter_customers')||'[]');
+  customers.unshift({ email, name, plan, tag, license, accessLink, created_at: new Date().toISOString() });
+  localStorage.setItem('leadhunter_customers', JSON.stringify(customers));
+  renderCustomerList();
+  showToast(`✅ Account created for ${email} — Pro license generated`);
+}
+
+function renderCustomerList(){
+  const list = document.getElementById('customerList');
+  if(!list) return;
+  let customers = JSON.parse(localStorage.getItem('leadhunter_customers')||'[]');
+  if(!customers.length){ list.innerHTML = `<div class="text-[11px] text-zinc-500 py-4 text-center">No customer accounts yet — generate one above. For Systeme.io, accounts auto-create after $49/mo payment.</div>`; return; }
+  list.innerHTML = customers.map(c=>`
+    <div class="p-3 rounded-lg bg-[#0F0F10] border border-white/[0.06] flex items-center justify-between gap-3">
+      <div class="flex-1 min-w-0">
+        <div class="text-[12px] font-medium text-white truncate">${c.name} — ${c.email}</div>
+        <div class="text-[10px] font-mono text-zinc-500">${c.plan} • ${c.tag} • ${new Date(c.created_at).toLocaleDateString()} • <span class="text-emerald-400">${c.license.slice(0,20)}...</span></div>
+      </div>
+      <div class="flex gap-1">
+        <button onclick="navigator.clipboard.writeText('${c.license}'); showToast('Copied license')" class="px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-[10px]">Copy Key</button>
+        <button onclick="navigator.clipboard.writeText('${c.accessLink}'); showToast('Copied link')" class="px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-[10px]">Copy Link</button>
+      </div>
+    </div>
+  `).join('');
+}
+
 async function toggleSave(id){
   // Check paywall for saves
   if(!isProUser() && savedLeads.length >= SUBSCRIPTION_CONFIG.freeSaves){
@@ -621,8 +733,18 @@ document.getElementById('sioTestBtn')?.addEventListener('click',async()=>{ saveS
   const params = new URLSearchParams(location.search);
   if(params.get('access')===SUBSCRIPTION_CONFIG.proParam || params.get('paid')==='1' || params.get('access')==='paid'){
     unlockPro();
-    // Clean URL
-    history.replaceState(null,'',location.pathname);
+    // Don't clean URL immediately if email param present (for customer tracking)
+    if(!params.get('email')) history.replaceState(null,'',location.pathname);
+  }
+  if(params.get('admin')==='1'){
+    document.getElementById('customerManager')?.classList.remove('hidden');
+    renderCustomerList();
+  }
+  // License key via URL param ?license=xxx
+  const licenseParam = params.get('license');
+  if(licenseParam && (licenseParam.toLowerCase().includes('pro') || licenseParam.length>=10)){
+    unlockPro();
+    showToast('✅ License from URL — Pro unlocked!');
   }
   if(isProUser()){
     document.getElementById('freeBadge')?.classList.add('hidden');
@@ -664,6 +786,8 @@ document.getElementById('sioTestBtn')?.addEventListener('click',async()=>{ saveS
       showToast('❌ Invalid license key');
     }
   });
+  // Customer account generator
+  document.getElementById('generateAccountBtn')?.addEventListener('click', generateCustomerAccount);
 
   const savedKeys=JSON.parse(localStorage.getItem('leadhunter_keys')||'{}');
   if(savedKeys.yt) document.getElementById('ytKey').value=savedKeys.yt;
@@ -679,6 +803,7 @@ document.getElementById('sioTestBtn')?.addEventListener('click',async()=>{ saveS
   if(savedSio.auto) document.getElementById('sioAuto').value=savedSio.auto;
   sioConfig=savedSio;
   updateSioStatus();
+  renderCustomerList();
 })();
 window.copyOutreach=copyOutreach; window.regenOutreach=regenOutreach; window.toggleSave=toggleSave; window.manualPushToSio=manualPushToSio; window.loadDemo=loadDemo;
 </script>
