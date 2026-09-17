@@ -655,6 +655,54 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; h
   </div>
 </section>
 
+<!-- ADMIN DASHBOARD (Functional Backend Control) - Visible via ?admin=1 or #admin -->
+<section id="adminPanel" class="hidden relative py-16 lg:py-20 border-y border-white/[0.08] bg-[#0F0F10]">
+  <div class="mx-auto max-w-[1200px] px-6 lg:px-8">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-[11px] font-mono tracking-widest text-amber-300">ADMIN • LOCAL BACKEND</div>
+        <h2 class="mt-3 text-[28px] font-bold tracking-tight">Leads Dashboard <span class="text-zinc-500 font-normal text-[18px] ml-2">— functional backend control</span></h2>
+        <p class="mt-2 text-[13px] text-zinc-500 max-w-[600px]">This is your functional backend. Leads are saved in browser localStorage + optionally sent to your webhook (GHL, Zapier, Sheets). For team access, connect a webhook in BACKEND_CONFIG.</p>
+      </div>
+      <div class="flex gap-2">
+        <button id="exportCsvBtn" class="px-4 py-2 rounded-full bg-white/[0.06] border border-white/[0.08] text-[13px] font-medium hover:bg-white/[0.1]">Export CSV</button>
+        <button id="clearLeadsBtn" class="px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20 text-red-300 text-[13px] font-medium hover:bg-red-500/20">Clear All</button>
+        <a href="#" onclick="document.getElementById('adminPanel').classList.add('hidden'); history.replaceState(null,'',location.pathname); return false;" class="px-4 py-2 rounded-full bg-white text-black text-[13px] font-semibold">Close Admin</a>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+      <div class="rounded-xl bg-[#151517] border border-white/[0.06] p-4"><div class="text-[11px] text-zinc-500 uppercase tracking-widest">Total Leads</div><div id="stat-total" class="text-[22px] font-bold mt-1">0</div></div>
+      <div class="rounded-xl bg-[#151517] border border-white/[0.06] p-4"><div class="text-[11px] text-zinc-500 uppercase tracking-widest">Today</div><div id="stat-today" class="text-[22px] font-bold mt-1">0</div></div>
+      <div class="rounded-xl bg-[#151517] border border-white/[0.06] p-4"><div class="text-[11px] text-zinc-500 uppercase tracking-widest">Webhook</div><div id="stat-webhook" class="text-[12px] font-mono mt-2 px-2 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] inline-flex">localStorage only</div></div>
+      <div class="rounded-xl bg-[#151517] border border-white/[0.06] p-4"><div class="text-[11px] text-zinc-500 uppercase tracking-widest">Backend Mode</div><div id="stat-mode" class="text-[12px] font-mono mt-2">localStorage + webhook (if set)</div></div>
+    </div>
+
+    <div class="mb-4 flex gap-3">
+      <input id="adminSearch" placeholder="Search name, email, business..." class="flex-1 h-10 px-4 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[13px] placeholder:text-zinc-600 focus:outline-none focus:border-brand-500/50"/>
+      <select id="adminFilter" class="h-10 px-3 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[13px]"><option value="">All volumes</option><option>10-50 leads / mo</option><option>50-200 leads / mo</option><option>200-500 leads / mo</option><option>500+ leads / mo</option></select>
+    </div>
+
+    <div class="rounded-[16px] overflow-hidden bg-[#151517] border border-white/[0.06]">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-[13px]">
+          <thead class="bg-[#0F0F10] border-b border-white/[0.06] text-[11px] uppercase tracking-widest text-zinc-500"><tr><th class="px-4 py-3 font-medium">Date</th><th class="px-4 py-3 font-medium">Name</th><th class="px-4 py-3 font-medium">Business</th><th class="px-4 py-3 font-medium">Email</th><th class="px-4 py-3 font-medium">Phone</th><th class="px-4 py-3 font-medium">Volume</th><th class="px-4 py-3 font-medium">Actions</th></tr></thead>
+          <tbody id="leadsTableBody" class="divide-y divide-white/[0.04] text-zinc-300"><tr><td colspan="7" class="px-4 py-10 text-center text-zinc-500">No leads yet — submit the form to see them here</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mt-8 p-5 rounded-xl bg-[#121214] border border-white/[0.06]">
+      <h3 class="text-[14px] font-semibold">🔧 How to control backend (make it team-ready)</h3>
+      <div class="mt-3 grid md:grid-cols-2 gap-4 text-[12px] leading-[1.6] text-zinc-400">
+        <div><div class="font-medium text-zinc-200">1. GoHighLevel / Zapier Webhook (recommended)</div>Open index.html → find <code class="px-1.5 py-0.5 rounded bg-white/[0.08] text-zinc-200">BACKEND_CONFIG.webhookUrl</code> → paste your GHL inbound webhook or Zapier Catch Hook URL → set <code class="px-1.5 py-0.5 rounded bg-white/[0.08]">mode: "both"</code> → push. All new leads will flow to GHL + stay in this dashboard as backup.</div>
+        <div><div class="font-medium text-zinc-200">2. Google Sheets / Email / Supabase</div>See BACKEND.md in repo for copy-paste Apps Script, Formspree, EmailJS, Supabase examples. You can keep GitHub Pages hosting — just point webhook to external service. For full custom backend, deploy same index.html to Vercel/Netlify and add /api/leads function.</div>
+      </div>
+      <div class="mt-4 flex gap-2 text-[11px] font-mono"><span class="px-2 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">Current: localStorage functional</span><span class="px-2 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400">Add ?admin=1 to URL to open this panel</span></div>
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer class="border-t border-white/[0.06] bg-[#0A0A0B] py-12">
   <div class="mx-auto max-w-[1200px] px-6 lg:px-8">
@@ -681,8 +729,8 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; h
     </div>
 
     <div class="mt-12 pt-8 border-t border-white/[0.06] flex flex-col sm:flex-row justify-between gap-3 text-[12px] text-zinc-600">
-      <span>© 2026 LeadPulse Inc. All rights reserved. Built for agencies who close.</span>
-      <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> All systems operational • 99.99% uptime</span>
+      <span>© 2026 LeadPulse Inc. All rights reserved. Built for agencies who close. <a href="?admin=1" class="ml-2 text-zinc-600 hover:text-zinc-300 underline decoration-dotted">• Admin</a></span>
+      <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> All systems operational • 99.99% uptime • <span id="leadCountFooter" class="text-zinc-500"></span></span>
     </div>
   </div>
 </footer>
@@ -691,6 +739,19 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; h
 <div id="toastContainer" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] pointer-events-none flex flex-col gap-2 items-center"></div>
 
 <script>
+// ================= BACKEND CONFIG - CONTROL YOUR LEADS =================
+// How to make it functional for team/production:
+// 1. Set webhookUrl to your GHL, Zapier, Make, Google Sheets Apps Script, Formspree, etc.
+// 2. mode: "localStorage" = only browser storage (demo), "webhook" = only send to webhook, "both" = do both (recommended)
+// 3. Push to GitHub → live in 1-2 min
+const BACKEND_CONFIG = {
+  webhookUrl: "", // e.g. "https://services.leadconnectorhq.com/hooks/xxx/webhook/yyy" or "https://hooks.zapier.com/hooks/catch/xxx/yyy" or "" for local only
+  mode: "both", // "localStorage" | "webhook" | "both"
+  // Optional: Add Supabase/Firebase config here if you want DB
+  // supabaseUrl: "", supabaseKey: "", table: "leads"
+};
+// ================= END BACKEND CONFIG =================
+
 // Icons
 lucide.createIcons();
 
@@ -801,7 +862,98 @@ function showToast(title, msg, type='success'){
   setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateY(10px)'; setTimeout(()=>el.remove(),300); }, 4500);
 }
 
-// Form submit
+// ================= FUNCTIONAL BACKEND LOGIC =================
+function getLeads(){ try { return JSON.parse(localStorage.getItem('leadpulse_leads')||'[]'); } catch { return []; } }
+function saveLead(data){
+  const leads = getLeads();
+  const lead = { id: Date.now().toString(36)+Math.random().toString(36).slice(2,6), timestamp: new Date().toISOString(), ...data, source: 'leadpulse-landing', url: location.href };
+  leads.unshift(lead);
+  localStorage.setItem('leadpulse_leads', JSON.stringify(leads));
+  return lead;
+}
+function deleteLead(id){
+  let leads = getLeads();
+  leads = leads.filter(l=>l.id!==id);
+  localStorage.setItem('leadpulse_leads', JSON.stringify(leads));
+  renderAdmin();
+}
+function exportLeadsCsv(){
+  const leads = getLeads();
+  if(!leads.length){ showToast('No leads','No leads to export yet','error'); return; }
+  const headers = ['timestamp','name','business','email','phone','volume','source'];
+  const rows = [headers.join(',')].concat(leads.map(l=> headers.map(h=> `"${(l[h]||'').toString().replace(/"/g,'""')}"`).join(',')));
+  const blob = new Blob([rows.join('\n')], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=`leadpulse-leads-${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
+}
+function renderAdmin(){
+  const leads = getLeads();
+  const tbody = document.getElementById('leadsTableBody');
+  const search = (document.getElementById('adminSearch')?.value||'').toLowerCase();
+  const filter = document.getElementById('adminFilter')?.value||'';
+  let filtered = leads.filter(l=>{
+    const matchSearch = !search || `${l.name} ${l.business} ${l.email} ${l.phone}`.toLowerCase().includes(search);
+    const matchFilter = !filter || l.volume===filter;
+    return matchSearch && matchFilter;
+  });
+  document.getElementById('stat-total').textContent = leads.length;
+  document.getElementById('stat-today').textContent = leads.filter(l=> new Date(l.timestamp).toDateString()===new Date().toDateString()).length;
+  document.getElementById('stat-webhook').textContent = BACKEND_CONFIG.webhookUrl ? '✅ webhook active' : 'localStorage only';
+  document.getElementById('stat-mode').textContent = BACKEND_CONFIG.mode + (BACKEND_CONFIG.webhookUrl ? ' + webhook' : '');
+  if(!filtered.length){
+    tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-10 text-center text-zinc-500">${leads.length?'No matches for search':'No leads yet — submit the form to see them here'}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map(l=>`
+    <tr class="hover:bg-white/[0.02]">
+      <td class="px-4 py-3 text-[11px] font-mono text-zinc-500">${new Date(l.timestamp).toLocaleString()}</td>
+      <td class="px-4 py-3 font-medium text-white">${l.name}</td>
+      <td class="px-4 py-3">${l.business}</td>
+      <td class="px-4 py-3 font-mono text-[12px]">${l.email}</td>
+      <td class="px-4 py-3 font-mono text-[12px]">${l.phone}</td>
+      <td class="px-4 py-3"><span class="px-2 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-[11px]">${l.volume||''}</span></td>
+      <td class="px-4 py-3"><button onclick="deleteLead('${l.id}')" class="text-zinc-500 hover:text-red-400 text-[12px]">Delete</button></td>
+    </tr>
+  `).join('');
+}
+// Admin panel toggling
+function checkAdminRoute(){
+  const params = new URLSearchParams(location.search);
+  const hash = location.hash;
+  if(params.get('admin')==='1' || hash==='#admin' || hash==='#admin-leads' || localStorage.getItem('leadpulse_admin_open')==='1'){
+    document.getElementById('adminPanel')?.classList.remove('hidden');
+    renderAdmin();
+    if(params.get('admin')==='1') setTimeout(()=>document.getElementById('adminPanel')?.scrollIntoView({behavior:'smooth'}), 300);
+  }
+}
+window.deleteLead = deleteLead;
+document.addEventListener('DOMContentLoaded', ()=>{
+  checkAdminRoute();
+  document.getElementById('exportCsvBtn')?.addEventListener('click', exportLeadsCsv);
+  document.getElementById('clearLeadsBtn')?.addEventListener('click', ()=>{
+    if(confirm('Clear all '+getLeads().length+' leads? This cannot be undone.')){ localStorage.removeItem('leadpulse_leads'); renderAdmin(); showToast('Cleared','All leads deleted','success'); }
+  });
+  document.getElementById('adminSearch')?.addEventListener('input', renderAdmin);
+  document.getElementById('adminFilter')?.addEventListener('change', renderAdmin);
+  window.addEventListener('hashchange', checkAdminRoute);
+  // Show admin dot in footer if leads exist
+  const leads = getLeads();
+  const footerCount = document.getElementById('leadCountFooter');
+  if(footerCount) footerCount.textContent = leads.length ? `${leads.length} leads captured` : 'No leads yet';
+  if(leads.length>0){
+    const footer = document.querySelector('footer');
+    if(footer && !document.getElementById('adminDot')){
+      const dot = document.createElement('a');
+      dot.id='adminDot';
+      dot.href='?admin=1';
+      dot.className='fixed bottom-4 right-4 z-40 px-3 py-2 rounded-full bg-[#1A1A1E] border border-white/[0.08] text-[11px] font-mono flex items-center gap-2 hover:bg-[#222] transition';
+      dot.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> ${leads.length} leads • Admin`;
+      document.body.appendChild(dot);
+    }
+  }
+});
+
+// Form submit - FUNCTIONAL
 const form = document.getElementById('leadForm');
 const btnText = document.getElementById('btnText');
 const btnSpinner = document.getElementById('btnSpinner');
@@ -809,21 +961,61 @@ form.addEventListener('submit', async (e)=>{
   e.preventDefault();
   btnText.textContent = 'Creating your workspace...';
   btnSpinner.classList.remove('hidden');
-  form.querySelector('button').disabled = true;
-  form.querySelector('button').classList.add('opacity-80','cursor-not-allowed');
-
-  // Simulate API
-  await new Promise(r=>setTimeout(r, 1200));
+  const submitBtn = form.querySelector('button');
+  submitBtn.disabled = true;
+  submitBtn.classList.add('opacity-80','cursor-not-allowed');
 
   const data = Object.fromEntries(new FormData(form).entries());
   console.log('Lead submitted', data);
 
-  showToast('Workspace created 🎉', `Check your email at ${data.email} — we sent your magic login link + SMS demo to ${data.phone}.`, 'success');
+  let webhookSuccess = false;
+  let webhookError = null;
+
+  // 1. Save to localStorage if mode allows
+  if(BACKEND_CONFIG.mode==='localStorage' || BACKEND_CONFIG.mode==='both' || !BACKEND_CONFIG.webhookUrl){
+    saveLead(data);
+  }
+
+  // 2. Send to webhook if configured
+  if((BACKEND_CONFIG.mode==='webhook' || BACKEND_CONFIG.mode==='both') && BACKEND_CONFIG.webhookUrl){
+    try {
+      const res = await fetch(BACKEND_CONFIG.webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...data, timestamp: new Date().toISOString(), source: 'leadpulse-landing', page_url: location.href, user_agent: navigator.userAgent })
+      });
+      webhookSuccess = res.ok;
+      if(!res.ok) webhookError = 'Webhook responded '+res.status;
+    } catch(err){
+      webhookError = err.message;
+      console.error('Webhook failed', err);
+    }
+    // If webhook mode = both and webhook failed, still keep localStorage as backup (already saved above if both)
+    if(BACKEND_CONFIG.mode==='both' && !webhookSuccess){
+      // ensure saved
+      if(!getLeads().find(l=>l.email===data.email && Date.now()-new Date(l.timestamp).getTime()<5000)){
+        saveLead(data);
+      }
+    }
+  } else if(BACKEND_CONFIG.mode==='webhook' && !BACKEND_CONFIG.webhookUrl){
+    showToast('Backend not configured','Set BACKEND_CONFIG.webhookUrl in index.html to enable webhook, or use mode localStorage','error');
+  }
+
+  // Simulate delay for UX if webhook was instant
+  await new Promise(r=>setTimeout(r, 600));
+
+  if(BACKEND_CONFIG.webhookUrl && !webhookSuccess && BACKEND_CONFIG.mode!=='localStorage'){
+    showToast('Saved locally, webhook failed ⚠️', `Lead saved in this browser, but webhook failed: ${webhookError}. Check BACKEND.md. Email: ${data.email}`, 'error');
+  } else {
+    showToast('Workspace created 🎉', `Lead captured! ${BACKEND_CONFIG.webhookUrl ? 'Sent to webhook + saved locally. ' : 'Saved in admin dashboard. '}Check email at ${data.email} — magic link + SMS demo to ${data.phone}. ${getLeads().length} total leads.`, 'success');
+  }
+
   form.reset();
   btnText.textContent = 'Get Instant Access →';
   btnSpinner.classList.add('hidden');
-  form.querySelector('button').disabled = false;
-  form.querySelector('button').classList.remove('opacity-80','cursor-not-allowed');
+  submitBtn.disabled = false;
+  submitBtn.classList.remove('opacity-80','cursor-not-allowed');
+  renderAdmin();
 
   // Confetti-ish
   for(let i=0;i<6;i++){
