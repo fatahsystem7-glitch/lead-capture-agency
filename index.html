@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeadPulse — Capture Every Lead. Close More Clients On Autopilot.</title>
+<meta name="description" content="The all-in-one lead capture & automation platform for agencies. Missed-call text-back, booking calendars, funnels, and nurture workflows that turn leads into revenue.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['Inter','sans-serif'], mono: ['JetBrains Mono','monospace'] },
+      colors: {
+        ink: { 900: '#0A0A0B', 800: '#111113', 700: '#1A1A1E', 600: '#252529', 500: '#2E2E33' },
+        brand: { 400: '#A78BFA', 500: '#8B5CF6', 600: '#7C3AED', 700: '#6D28D9' }
+      },
+      animation: {
+        'float': 'float 6s ease-in-out infinite',
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4,0,0.6,1) infinite',
+        'shimmer': 'shimmer 2s linear infinite',
+      },
+      keyframes: {
+        float: { '0%,100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-10px)' } },
+        shimmer: { '0%': { transform: 'translateX(-100%)' }, '100%': { transform: 'translateX(100%)' } }
+      }
+    }
+  }
+}
+</script>
+<style>
+* { -webkit-font-smoothing: antialiased; }
+body { background:#0A0A0B; }
+.glass { background: rgba(17,17,19,0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.06); }
+.gradient-text { background: linear-gradient(100deg, #A78BFA 0%, #8B5CF6 20%, #6366F1 50%, #22D3EE 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.gradient-border { position: relative; }
+.gradient-border::before { content:''; position:absolute; inset:0; border-radius: inherit; padding:1px; background: linear-gradient(135deg, rgba(139,92,246,0.5), rgba(255,255,255,0.05)); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events:none; }
+.btn-primary { background: linear-gradient(100deg, #8B5CF6, #6366F1); box-shadow: 0 0 20px rgba(139,92,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2); transition: all .2s; }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 0 30px rgba(139,92,246,0.5), inset 0 1px 0 rgba(255,255,255,0.2); }
+.btn-primary:active { transform: translateY(0); }
+.reveal { opacity:0; transform: translateY(16px); transition: all .7s cubic-bezier(0.16,1,0.3,1); }
+.reveal.in { opacity:1; transform: translateY(0); }
+.scrollbar-none::-webkit-scrollbar { display:none; }
+input[type=range] { -webkit-appearance:none; height:6px; background:#252529; border-radius:99px; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; height:20px; border-radius:50%; background:#8B5CF6; border:3px solid #0A0A0B; box-shadow:0 0 0 4px rgba(139,92,246,0.2); cursor:pointer; }
+.toast-enter { animation: toastIn .4s cubic-bezier(0.16,1,0.3,1) forwards; }
+@keyframes toastIn { from{ transform: translateY(20px) scale(.98); opacity:0 } to{ transform: translateY(0) scale(1); opacity:1 } }
+.grid-pattern { background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px); background-size: 24px 24px; }
+</style>
+</head>
+<body class="font-sans text-zinc-100 selection:bg-brand-500/30 selection:text-white overflow-x-hidden">
+
+<!-- Scroll Progress -->
+<div id="scrollProgress" class="fixed top-0 left-0 h-[2px] bg-gradient-to-r from-brand-500 to-cyan-400 z-[100] w-0"></div>
+
+<!-- Header -->
+<header id="header" class="fixed top-0 w-full z-50 transition-all duration-300 border-b border-transparent">
+<div class="mx-auto max-w-[1200px] px-6 lg:px-8">
+<div class="flex h-[72px] items-center justify-between">
+  <a href="#" class="flex items-center gap-3 group">
+    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.4)] group-hover:shadow-[0_0_30px_rgba(139,92,246,0.6)] transition-all">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    </div>
+    <span class="text-[18px] font-bold tracking-tight">LeadPulse</span>
+    <span class="hidden sm:inline-flex ml-2 text-[10px] font-mono font-medium tracking-widest px-2 py-0.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400">AGENCY OS</span>
+  </a>
+
+  <nav class="hidden md:flex items-center gap-8">
+    <a href="#services" class="text-[14px] text-zinc-400 hover:text-white transition">Services</a>
+    <a href="#features" class="text-[14px] text-zinc-400 hover:text-white transition">Features</a>
+    <a href="#calculator" class="text-[14px] text-zinc-400 hover:text-white transition">ROI Calculator</a>
+    <a href="#pricing" class="text-[14px] text-zinc-400 hover:text-white transition">Pricing</a>
+  </nav>
+
+  <div class="hidden md:flex items-center gap-3">
+    <a href="#contact" class="text-[14px] font-medium text-zinc-300 hover:text-white px-4 py-2 transition">Sign in</a>
+    <a href="#contact" class="btn-primary text-[14px] font-semibold px-5 py-2.5 rounded-full text-white">Book a Demo →</a>
+  </div>
+
+  <button id="mobileMenuBtn" class="md:hidden w-10 h-10 rounded-full glass flex items-center justify-center">
+    <i data-lucide="menu" class="w-5 h-5"></i>
+  </button>
+</div>
+</div>
+
+<!-- Mobile Menu -->
+<div id="mobileMenu" class="md:hidden hidden border-t border-white/[0.06] bg-[#111113]/95 backdrop-blur-xl">
+  <div class="px-6 py-6 space-y-5">
+    <a href="#services" class="block text-[16px] text-zinc-300">Services</a>
+    <a href="#features" class="block text-[16px] text-zinc-300">Features</a>
+    <a href="#calculator" class="block text-[16px] text-zinc-300">ROI Calculator</a>
+    <a href="#pricing" class="block text-[16px] text-zinc-300">Pricing</a>
+    <a href="#contact" class="btn-primary block text-center font-semibold px-5 py-3 rounded-full text-white mt-4">Book a Demo</a>
+  </div>
+</div>
+</header>
+
+<!-- HERO -->
+<section class="relative pt-[120px] pb-20 lg:pt-[168px] lg:pb-28 overflow-hidden">
+  <div class="absolute inset-0 -z-10">
+    <div class="absolute inset-0 bg-gradient-to-b from-[#15131F] via-[#0A0A0B] to-[#0A0A0B]"></div>
+    <div class="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-[radial-gradient(ellipse_at_center,_rgba(139,92,246,0.25),_transparent_60%)] blur-[60px]"></div>
+    <div class="absolute top-[10%] right-[10%] w-[500px] h-[500px] bg-[radial-gradient(ellipse_at_center,_rgba(99,102,241,0.18),_transparent_70%)] blur-[50px]"></div>
+    <div class="absolute inset-0 grid-pattern opacity-[0.4]"></div>
+  </div>
+
+  <div class="mx-auto max-w-[1200px] px-6 lg:px-8">
+    <div class="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-8 items-center">
+      <div class="reveal in">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.08] text-[12px] font-medium mb-6">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-zinc-300">LIVE: 2,847 leads captured today</span>
+          <span class="hidden sm:inline-flex w-px h-3 bg-white/10 mx-1"></span>
+          <span class="hidden sm:inline text-zinc-500">Trusted by 1,200+ agencies</span>
+        </div>
+
+        <h1 class="text-[38px] sm:text-[48px] lg:text-[56px] font-[800] leading-[0.95] tracking-[-0.03em]">
+          Stop losing leads.<br>
+          <span class="gradient-text">Start closing on autopilot.</span>
+        </h1>
+
+        <p class="mt-6 text-[17px] leading-[1.6] text-zinc-400 max-w-[520px]">
+          The all-in-one Agency OS that captures every missed call, books appointments while you sleep, and nurtures leads into paying clients — <span class="text-zinc-200 font-medium">without hiring more staff.</span>
+        </p>
+
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="#contact" class="btn-primary inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-[15px] font-semibold text-white">
+            Start 14-Day Free Trial
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="#calculator" class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-[15px] font-medium bg-white/[0.06] border border-white/[0.08] hover:bg-white/[0.1] transition">
+            <span class="w-5 h-5 rounded-full bg-white text-black flex items-center justify-center text-[10px]">▶</span>
+            See ROI Calculator
+          </a>
+        </div>
+
+        <div class="mt-8 flex items-center gap-6">
+          <div class="flex -space-x-2">
+            <img src="https://i.pravatar.cc/32?img=1" class="w-8 h-8 rounded-full border-2 border-[#0A0A0B]"/>
+            <img src="https://i.pravatar.cc/32?img=2" class="w-8 h-8 rounded-full border-2 border-[#0A0A0B]"/>
+            <img src="https://i.pravatar.cc/32?img=3" class="w-8 h-8 rounded-full border-2 border-[#0A0A0B]"/>
+            <div class="w-8 h-8 rounded-full bg-ink-700 border-2 border-[#0A0A0B] flex items-center justify-center text-[10px] font-bold">+1k</div>
+          </div>
+          <div class="text-[13px] leading-tight">
+            <div class="flex gap-1 text-amber-400">★★★★★ <span class="text-zinc-400 ml-1">4.9/5</span></div>
+            <div class="text-zinc-500">from 342 agency owners</div>
+          </div>
+          <div class="hidden sm:flex items-center gap-2 text-[12px] text-zinc-500">
+            <span class="w-px h-6 bg-white/10"></span>
+            <span>No credit card • Cancel anytime</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard Mockup -->
+      <div class="reveal in relative lg:ml-6" style="transition-delay:150ms">
+        <div class="relative rounded-[24px] glass gradient-border p-2 shadow-[0_20px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.04)] animate-float">
+          <div class="rounded-[16px] overflow-hidden bg-[#0F0F10] border border-white/[0.06]">
+            <!-- Mock Header -->
+            <div class="h-12 flex items-center justify-between px-4 bg-[#151517] border-b border-white/[0.06]">
+              <div class="flex items-center gap-2">
+                <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+                <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+                <div class="ml-4 text-[11px] font-mono text-zinc-500">leadpulse.app/dashboard • Live</div>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                <div class="text-[11px] text-zinc-400">12 online</div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-[200px_1fr] lg:grid-cols-[220px_1fr]">
+              <!-- Sidebar -->
+              <div class="bg-[#121214] border-r border-white/[0.06] p-3 hidden sm:block">
+                <div class="space-y-1">
+                  <div class="flex items-center gap-2 px-2 py-2 rounded-lg bg-white/[0.06] text-[12px] font-medium"><span>📊</span> Pipeline</div>
+                  <div class="flex items-center gap-2 px-2 py-2 rounded-lg text-zinc-500 text-[12px]"><span>💬</span> Conversations <span class="ml-auto bg-brand-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">24</span></div>
+                  <div class="flex items-center gap-2 px-2 py-2 rounded-lg text-zinc-500 text-[12px]"><span>📅</span> Calendar</div>
+                  <div class="flex items-center gap-2 px-2 py-2 rounded-lg text-zinc-500 text-[12px]"><span>⚡</span> Automations</div>
+                </div>
+                <div class="mt-6 p-3 rounded-xl bg-gradient-to-br from-brand-600/20 to-indigo-600/20 border border-brand-500/20">
+                  <div class="text-[11px] font-semibold text-brand-400">This Month</div>
+                  <div class="text-[22px] font-bold mt-1">$84,420</div>
+                  <div class="text-[11px] text-emerald-400 mt-1">↗ +32% vs last month</div>
+                </div>
+              </div>
+
+              <!-- Main Content Mock -->
+              <div class="p-3 sm:p-4 space-y-3 bg-[#0F0F10]">
+                <div class="grid grid-cols-3 gap-2 sm:gap-3">
+                  <div class="rounded-xl bg-[#1A1A1E] border border-white/[0.06] p-3">
+                    <div class="text-[10px] text-zinc-500 uppercase tracking-widest">New Leads</div>
+                    <div class="text-[20px] font-bold mt-1">147</div>
+                    <div class="text-[11px] text-emerald-400 mt-1">+18% • Auto-captured</div>
+                  </div>
+                  <div class="rounded-xl bg-[#1A1A1E] border border-white/[0.06] p-3">
+                    <div class="text-[10px] text-zinc-500 uppercase tracking-widest">Booked</div>
+                    <div class="text-[20px] font-bold mt-1">89</div>
+                    <div class="text-[11px] text-brand-400 mt-1">Calendar synced</div>
+                  </div>
+                  <div class="rounded-xl bg-[#1A1A1E] border border-white/[0.06] p-3">
+                    <div class="text-[10px] text-zinc-500 uppercase tracking-widest">Revenue</div>
+                    <div class="text-[20px] font-bold mt-1">$42k</div>
+                    <div class="text-[11px] text-zinc-400 mt-1">Closed this week</div>
+                  </div>
+                </div>
+
+                <div class="rounded-xl bg-[#1A1A1E] border border-white/[0.06] overflow-hidden">
+                  <div class="flex items-center justify-between px-3 py-2.5 border-b border-white/[0.06]">
+                    <div class="text-[12px] font-medium">Live Conversations</div>
+                    <div class="text-[10px] px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">AI Replying • 3 active</div>
+                  </div>
+                  <div class="p-3 space-y-2.5">
+                    <div class="flex gap-2.5">
+                      <img src="https://i.pravatar.cc/24?img=8" class="w-6 h-6 rounded-full"/>
+                      <div class="flex-1">
+                        <div class="flex items-center gap-2"><span class="text-[12px] font-medium">Sarah Miller</span><span class="text-[10px] text-zinc-500">missed call → auto text</span></div>
+                        <div class="mt-1 text-[11px] leading-[1.4] p-2.5 rounded-lg rounded-tl-none bg-[#252529] text-zinc-300 max-w-[85%]">Hi Sarah! Saw you tried to call — I'm with a client. Can I book you for tomorrow 2pm? — LeadPulse AI</div>
+                      </div>
+                    </div>
+                    <div class="flex gap-2.5 justify-end">
+                      <div class="text-[11px] p-2.5 rounded-lg rounded-tr-none bg-brand-600 text-white max-w-[75%]">Yes! 2pm works perfect, thanks for quick reply 🙏</div>
+                    </div>
+                    <div class="flex items-center gap-2 text-[10px] text-zinc-500 pt-1"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Lead recovered in 23 seconds • Meeting booked</div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                  <div class="rounded-lg bg-[#151517] border border-white/[0.05] p-2.5 flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center text-[14px]">📞</div>
+                    <div><div class="text-[11px] font-medium">Missed-call text-back</div><div class="text-[10px] text-zinc-500">Active • 100% capture</div></div>
+                  </div>
+                  <div class="rounded-lg bg-[#151517] border border-white/[0.05] p-2.5 flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-[14px]">🤖</div>
+                    <div><div class="text-[11px] font-medium">AI Nurture</div><div class="text-[10px] text-zinc-500">7-day sequence on</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating cards -->
+          <div class="absolute -left-6 top-[18%] hidden lg:flex items-center gap-2 px-3 py-2 rounded-full bg-[#1A1A1E] border border-white/[0.08] shadow-xl">
+            <div class="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[12px]">✓</div>
+            <span class="text-[12px] font-medium">Lead captured • 0.8s</span>
+          </div>
+          <div class="absolute -right-8 bottom-[22%] hidden lg:flex items-center gap-2 px-3 py-2 rounded-full bg-[#1A1A1E] border border-white/[0.08] shadow-xl">
+            <div class="w-6 h-6 rounded-full bg-brand-500 flex items-center justify-center">📅</div>
+            <span class="text-[12px] font-medium">Appointment booked</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logos -->
+    <div class="mt-16 lg:mt-24 border-t border-white/[0.06] pt-8 reveal">
+      <div class="flex flex-wrap items-center justify-between gap-6 opacity-60">
+        <span class="text-[11px] font-mono tracking-widest text-zinc-500 uppercase">Trusted by growth teams at</span>
+        <div class="flex flex-wrap gap-8 lg:gap-12 items-center text-[14px] font-semibold text-zinc-400">
+          <span class="flex items-center gap-2"><span class="w-6 h-6 rounded bg-white/10"></span>NorthPeak Media</span>
+          <span class="flex items-center gap-2"><span class="w-6 h-6 rounded bg-white/10"></span>ScaleHouse</span>
+          <span class="flex items-center gap-2"><span class="w-6 h-6 rounded bg-white/10"></span>ConversionLab</span>
+          <span class="flex items-center gap-2"><span class="w-6 h-6 rounded bg-white/10"></span>Brightline Co.</span>
+          <span class="flex items-center gap-2"><span class="w-6 h-6 rounded bg-white/10"></span>UpRight</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CORE FEATURES -->
+<section id="services" class="relative py-20 lg:py-28 border-t border-white/[0.06] bg-[#0E0E10]">
+  <div class="mx-auto max-w-[1200px] px-6 lg:px-8">
+    <div class="max-w-[640px] mx-auto text-center reveal">
+      <div class="inline-flex px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-[11px] font-mono tracking-widest text-brand-400">THE AGENCY OS STACK</div>
+      <h2 class="mt-4 text-[32px] lg:text-[44px] font-bold leading-[1.05] tracking-tight">Everything you need to <span class="text-zinc-500">never lose a lead again</span></h2>
+      <p class="mt-4 text-[16px] leading-[1.6] text-zinc-400">Stop duct-taping 6 tools. LeadPulse replaces your CRM, calendar, funnels, inbox, and follow-up — in one blazing-fast platform.</p>
+    </div>
+
+    <div id="features" class="mt-14 grid md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+      <!-- Card 1 -->
+      <div class="reveal group relative rounded-[20px] bg-[#151517] border border-white/[0.06] p-6 lg:p-7 hover:border-brand-500/30 hover:bg-[#19191C] transition-all duration-300">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 border border-violet-500/20 flex items-center justify-center text-[20px] group-hover:scale-110 transition">📞</div>
+        <h3 class="mt-5 text-[17px] font-semibold">Missed-Call Text-Back</h3>
+        <p class="mt-2 text-[14px] leading-[1.6] text-zinc-400">Every missed call instantly gets an SMS: “Hey, on a call — can I text you?” Recover 32% more leads without lifting a finger.</p>
+        <div class="mt-5 flex items-center gap-2 text-[12px] font-mono">
+          <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">23s avg. response</span>
+          <span class="px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400">AI + Human handoff</span>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="reveal group relative rounded-[20px] bg-[#151517] border border-white/[0.06] p-6 lg:p-7 hover:border-brand-500/30 hover:bg-[#19191C] transition-all duration-300" style="transition-delay:80ms">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/20 flex items-center justify-center text-[20px] group-hover:scale-110 transition">💬</div>
+        <h3 class="mt-5 text-[17px] font-semibold">Unified Inbox 2.0</h3>
+        <p class="mt-2 text-[14px] leading-[1.6] text-zinc-400">SMS, FB, IG, Email, WhatsApp, GMB — one inbox. AI drafts replies, tags intent, and books meetings while you close deals.</p>
+        <div class="mt-5 h-[68px] rounded-xl bg-[#0F0F10] border border-white/[0.06] p-2.5 flex gap-2">
+          <div class="w-6 h-6 rounded-full bg-zinc-700"></div>
+          <div class="flex-1 space-y-1.5"><div class="h-2 w-[70%] rounded bg-white/10"></div><div class="h-2 w-[90%] rounded bg-white/[0.06]"></div><div class="h-6 w-[60%] rounded-full bg-brand-600/30 border border-brand-500/30"></div></div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="reveal group relative rounded-[20px] bg-[#151517] border border-white/[0.06] p-6 lg:p-7 hover:border-brand-500/30 hover:bg-[#19191C] transition-all duration-300" style="transition-delay:160ms">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/20 flex items-center justify-center text-[20px] group-hover:scale-110 transition">📅</div>
+        <h3 class="mt-5 text-[17px] font-semibold">Smart Booking Calendar</h3>
+        <p class="mt-2 text-[14px] leading-[1.6] text-zinc-400">Round-robin, buffers, no-shows automations, Stripe payments. Embed on any page or share a link. 2-way Google/Outlook sync.</p>
+        <div class="mt-5 grid grid-cols-7 gap-1 text-[10px] text-center">
+          <span class="text-zinc-600">M</span><span class="text-zinc-600">T</span><span class="text-zinc-600">W</span><span class="text-zinc-600">T</span><span class="text-zinc-600">F</span><span class="text-zinc-600">S</span><span class="text-zinc-600">S</span>
+          <span class="p-1">24</span><span class="p-1 bg-brand-600 text-white rounded-md">25</span><span class="p-1">26</span><span class="p-1">27</span><span class="p-1 text-zinc-600">28</span><span class="p-1 text-zinc-600">29</span><span class="p-1 text-zinc-600">30</span>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="reveal group relative rounded-[20px] bg-[#151517] border border-white/[0.06] p-6 lg:p-7 hover:border-brand-500/30 hover:bg-[#19191C] transition-all duration-300">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-fuchsia-500/20 to-pink-500/20 border border-fuchsia-500/20 flex items-center justify-center text-[20px] group-hover:scale-110 transition">⚡</div>
+        <h3 class="mt-5 text-[17px] font-semibold">Funnel Builder + Pages</h3>
+        <p class="mt-2 text-[14px] leading-[1.6] text-zinc-400">High-converting templates for lead capture, VSL, booking, and checkout. 1-click import, custom domains, 90+ Lighthouse score.</p>
+        <div class="mt-5 flex gap-2">
+          <div class="flex-1 h-16 rounded-lg bg-[#0F0F10] border border-white/[0.06] p-2"><div class="h-2 w-3/4 bg-white/20 rounded"></div><div class="mt-2 h-6 w-full bg-white/[0.06] rounded"></div><div class="mt-2 h-4 w-1/2 bg-brand-600 rounded"></div></div>
+          <div class="flex-1 h-16 rounded-lg bg-[#0F0F10] border border-white/[0.06] p-2 opacity-60"><div class="h-2 w-3/4 bg-white/20 rounded"></div><div class="mt-2 h-6 w-full bg-white/[0.06] rounded"></div></div>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="reveal group relative rounded-[20px] bg-[#151517] border border-white/[0.06] p-6 lg:p-7 hover:border-brand-500/30 hover:bg-[#19191C] transition-all duration-300" style="transition-delay:80ms">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/20 flex items-center justify-center text-[20px] group-hover:scale-110 transition">🤖</div>
+        <h3 class="mt-5 text-[17px] font-semibold">Lead Nurture Workflows</h3>
+        <p class="mt-2 text-[14px] leading-[1.6] text-zinc-400">Visual automation builder: if no reply → wait 5m → SMS → if booked → stop. Long-term nurture for 90 days. No code.</p>
+        <div class="mt-5 flex items-center gap-2 text-[11px] font-mono">
+          <div class="px-2 py-1 rounded bg-[#1F1F23] border border-white/10">Trigger: New Lead</div>
+          <span>→</span>
+          <div class="px-2 py-1 rounded bg-brand-600/20 border border-brand-500/30 text-brand-300">SMS + Email</div>
+          <span>→</span>
+          <div class="px-2 py-1 rounded bg-emerald-500/20 border border-emerald-500/30 text-emerald-300">Booked</div>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="reveal group relative rounded-[20px] bg-[#151517] border border-white/[0.06] p-6 lg:p-7 hover:border-brand-500/30 hover:bg-[#19191C] transition-all duration-300" style="transition-delay:160ms">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-zinc-500/20 to-zinc-700/20 border border-white/10 flex items-center justify-center text-[20px] group-hover:scale-110 transition">📈</div>
+        <h3 class="mt-5 text-[17px] font-semibold">Attribution & Analytics</h3>
+        <p class="mt-2 text-[14px] leading-[1.6] text-zinc-400">Know exactly which ad, keyword, and funnel drove each deal. Call tracking, source reporting, and revenue dashboard included.</p>
+        <div class="mt-5 h-[56px] flex items-end gap-1">
+          <div class="flex-1 h-[30%] bg-white/10 rounded"></div><div class="flex-1 h-[50%] bg-white/15 rounded"></div><div class="flex-1 h-[40%] bg-white/10 rounded"></div><div class="flex-1 h-[80%] bg-gradient-to-t from-brand-600 to-brand-400 rounded"></div><div class="flex-1 h-[65%] bg-white/15 rounded"></div><div class="flex-1 h-[90%] bg-gradient-to-t from-brand-600 to-cyan-400 rounded"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROI CALCULATOR -->
+<section id="calculator" class="relative py-20 lg:py-28 bg-[#0A0A0B] overflow-hidden">
+  <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(139,92,246,0.12),_transparent_60%)]"></div>
+  <div class="mx-auto max-w-[1200px] px-6 lg:px-8 relative">
+    <div class="grid lg:grid-cols-2 gap-10 lg:gap-12 items-start">
+      <div class="reveal">
+        <div class="inline-flex items-center gap-2 text-[11px] font-mono tracking-widest px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300">INTERACTIVE • ROI ESTIMATOR</div>
+        <h2 class="mt-5 text-[32px] lg:text-[42px] font-bold leading-[1.05] tracking-tight">How much revenue are you leaving on the table?</h2>
+        <p class="mt-4 text-zinc-400 text-[15px] leading-[1.6]">Adjust your numbers. See how missed-call text-back + instant nurture recovers lost deals. Most agencies add $8k–$24k/mo in 30 days.</p>
+
+        <div class="mt-8 space-y-7 p-6 lg:p-7 rounded-[20px] bg-[#121214] border border-white/[0.06]">
+          <div>
+            <div class="flex justify-between text-[13px]"><span class="text-zinc-400">Leads per month</span><span class="font-mono font-bold text-white" id="val-leads">120</span></div>
+            <input id="input-leads" type="range" min="10" max="500" value="120" step="10" class="w-full mt-3">
+            <div class="flex justify-between text-[11px] text-zinc-600 mt-1"><span>10</span><span>500</span></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-[13px]"><span class="text-zinc-400">Current close rate</span><span class="font-mono font-bold text-white" id="val-close">18%</span></div>
+            <input id="input-close" type="range" min="5" max="50" value="18" step="1" class="w-full mt-3">
+          </div>
+          <div>
+            <div class="flex justify-between text-[13px]"><span class="text-zinc-400">Average deal value</span><span class="font-mono font-bold text-white" id="val-deal">$2,500</span></div>
+            <input id="input-deal" type="range" min="500" max="10000" value="2500" step="250" class="w-full mt-3">
+          </div>
+
+          <div class="pt-4 border-t border-white/[0.06] flex items-center gap-3 text-[12px] text-zinc-500">
+            <span class="w-6 h-6 rounded-full bg-white/[0.06] flex items-center justify-center">i</span>
+            We add 15% close-rate lift from instant response + 27% missed-call recovery (industry benchmark).
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal lg:sticky lg:top-[96px]" style="transition-delay:120ms">
+        <div class="rounded-[24px] bg-[#151517] border border-white/[0.08] p-6 lg:p-8 shadow-[0_20px_80px_rgba(0,0,0,0.5)] overflow-hidden relative">
+          <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-500/50 to-transparent"></div>
+
+          <div class="flex items-center justify-between">
+            <h3 class="text-[13px] font-mono tracking-widest text-zinc-500 uppercase">Your Growth Projection</h3>
+            <span class="text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">Live calculation</span>
+          </div>
+
+          <div class="mt-6 grid grid-cols-2 gap-4">
+            <div class="rounded-xl bg-[#0F0F10] border border-white/[0.06] p-4">
+              <div class="text-[11px] text-zinc-500 uppercase tracking-widest">Current monthly</div>
+              <div class="mt-1 text-[22px] font-bold" id="out-current">$54,000</div>
+              <div class="mt-1 text-[11px] text-zinc-500">at <span id="out-current-rate">18%</span> close rate</div>
+            </div>
+            <div class="rounded-xl bg-gradient-to-br from-brand-600/20 to-indigo-600/20 border border-brand-500/30 p-4">
+              <div class="text-[11px] text-brand-300 uppercase tracking-widest">With LeadPulse</div>
+              <div class="mt-1 text-[22px] font-bold text-white" id="out-projected">$108,900</div>
+              <div class="mt-1 text-[11px] text-brand-300">at <span id="out-projected-rate">33%</span> + recovery</div>
+            </div>
+          </div>
+
+          <div class="mt-6 rounded-xl bg-[#0F0F10] border border-white/[0.06] p-4 flex items-center justify-between">
+            <div>
+              <div class="text-[12px] text-zinc-400">Extra revenue per month</div>
+              <div class="text-[12px] text-zinc-600 mt-0.5">Annualized impact</div>
+            </div>
+            <div class="text-right">
+              <div class="text-[26px] font-extrabold gradient-text" id="out-extra">+$54,900</div>
+              <div class="text-[12px] font-mono text-zinc-400" id="out-annual">+$658,800 / year</div>
+            </div>
+          </div>
+
+          <div class="mt-6 space-y-3">
+            <div class="flex justify-between text-[12px]"><span class="text-zinc-400">Recovered missed calls (27%)</span><span class="font-mono text-white" id="out-recovered">32 leads</span></div>
+            <div class="flex justify-between text-[12px]"><span class="text-zinc-400">Meetings auto-booked</span><span class="font-mono text-white" id="out-meetings">+18 / mo</span></div>
+            <div class="flex justify-between text-[12px]"><span class="text-zinc-400">Time saved on follow-up</span><span class="font-mono text-white">~47 hrs / mo</span></div>
+          </div>
+
+          <a href="#contact" class="mt-7 btn-primary w-full flex items-center justify-center gap-2 py-3.5 rounded-full font-semibold text-[15px] text-white">
+            Claim This Growth — Start Free
+            <span class="text-[12px] opacity-80">→</span>
+          </a>
+          <div class="mt-3 text-center text-[11px] text-zinc-500">Set up in 7 minutes • No card required • Cancel anytime</div>
+
+          <!-- Confetti effect container -->
+          <div class="pointer-events-none absolute inset-0 overflow-hidden">
+            <div class="absolute -top-10 left-[20%] w-1 h-1 bg-brand-400 rounded-full animate-[float_3s_ease-in-out_infinite]"></div>
+            <div class="absolute -top-6 right-[30%] w-1.5 h-1.5 bg-cyan-400 rounded-full animate-[float_4s_ease-in-out_infinite]"></div>
+          </div>
+        </div>
+
+        <div class="mt-4 flex items-center justify-center gap-2 text-[12px] text-zinc-500">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          14 agencies started trial in last 24h
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section class="py-20 lg:py-24 border-y border-white/[0.06] bg-[#0E0E10]">
+  <div class="mx-auto max-w-[1200px] px-6 lg:px-8">
+    <div class="flex flex-wrap items-end justify-between gap-6 reveal">
+      <div>
+        <h2 class="text-[28px] lg:text-[36px] font-bold tracking-tight leading-[1.1]">Agencies scaling with<br><span class="text-zinc-500">LeadPulse</span></h2>
+      </div>
+      <div class="text-[14px] text-zinc-400 max-w-[420px]">“We went from 12% to 34% show-up rate. Missed-call text-back alone added $18k last month.” Real results, not vanity metrics.</div>
+    </div>
+
+    <div class="mt-10 grid md:grid-cols-3 gap-4 lg:gap-5">
+      <div class="reveal rounded-[20px] bg-[#151517] border border-white/[0.06] p-6">
+        <div class="flex items-center gap-3">
+          <img src="https://i.pravatar.cc/40?img=12" class="w-10 h-10 rounded-full"/>
+          <div><div class="text-[14px] font-semibold">Marcus T.</div><div class="text-[12px] text-zinc-500">Founder, ScaleHouse • 32 clients</div></div>
+          <div class="ml-auto text-amber-400 text-[12px]">★★★★★</div>
+        </div>
+        <p class="mt-4 text-[14px] leading-[1.6] text-zinc-300">“Switched from GoHighLevel. Setup took 20 mins. We recovered 41 missed calls in week 1. Our calendar is now full 2 weeks out.”</p>
+        <div class="mt-4 flex gap-2 text-[11px] font-mono"><span class="px-2 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">+$21,400 MRR</span><span class="px-2 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400">in 28 days</span></div>
+      </div>
+
+      <div class="reveal rounded-[20px] bg-[#151517] border border-white/[0.06] p-6" style="transition-delay:80ms">
+        <div class="flex items-center gap-3">
+          <img src="https://i.pravatar.cc/40?img=5" class="w-10 h-10 rounded-full"/>
+          <div><div class="text-[14px] font-semibold">Jenna R.</div><div class="text-[12px] text-zinc-500">Owner, Brightline Co. • UK</div></div>
+          <div class="ml-auto text-amber-400 text-[12px]">★★★★★</div>
+        </div>
+        <p class="mt-4 text-[14px] leading-[1.6] text-zinc-300">“The nurture workflows are insane. 90-day follow-up that actually sounds human. 3 old leads closed last week after 60 days dormant.”</p>
+        <div class="mt-4 flex gap-2 text-[11px] font-mono"><span class="px-2 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-300">63% reply rate</span><span class="px-2 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400">AI nurture</span></div>
+      </div>
+
+      <div class="reveal rounded-[20px] bg-[#151517] border border-white/[0.06] p-6" style="transition-delay:160ms">
+        <div class="flex items-center gap-3">
+          <img src="https://i.pravatar.cc/40?img=15" class="w-10 h-10 rounded-full"/>
+          <div><div class="text-[14px] font-semibold">David L.</div><div class="text-[12px] text-zinc-500">Agency Owner, US • 11 staff</div></div>
+          <div class="ml-auto text-amber-400 text-[12px]">★★★★★</div>
+        </div>
+        <p class="mt-4 text-[14px] leading-[1.6] text-zinc-300">“We replaced Calendly, ActiveCampaign, and CallRail. Saved $847/mo and finally have attribution that my media buyer trusts.”</p>
+        <div class="mt-4 flex gap-2 text-[11px] font-mono"><span class="px-2 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300">-$847 tool stack</span><span class="px-2 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400">All-in-one</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="py-20 lg:py-28 bg-[#0A0A0B] relative overflow-hidden">
+  <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_rgba(99,102,241,0.12),_transparent_60%)]"></div>
+  <div class="mx-auto max-w-[1200px] px-6 lg:px-8 relative">
+    <div class="max-w-[680px] mx-auto text-center reveal">
+      <div class="inline-flex px-3 py-1 rounded-full bg-white/[0.05] border border-white/[0.08] text-[11px] font-mono tracking-widest text-zinc-400">SIMPLE PRICING • CANCEL ANYTIME</div>
+      <h2 class="mt-4 text-[32px] lg:text-[44px] font-bold leading-[1.05] tracking-tight">Start free, scale when you win</h2>
+      <p class="mt-4 text-zinc-400">All plans include missed-call text-back, unified inbox, and unlimited contacts. 14-day free trial, no credit card.</p>
+
+      <div class="mt-8 inline-flex p-1 rounded-full bg-[#151517] border border-white/[0.08]">
+        <button id="billing-monthly" class="px-5 py-2 rounded-full text-[13px] font-medium bg-white text-black">Monthly</button>
+        <button id="billing-yearly" class="px-5 py-2 rounded-full text-[13px] font-medium text-zinc-400 hover:text-white">Yearly <span class="ml-1 px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px]">-20%</span></button>
+      </div>
+    </div>
+
+    <div class="mt-12 grid lg:grid-cols-3 gap-5 max-w-[1080px] mx-auto">
+      <!-- Starter -->
+      <div class="reveal rounded-[24px] bg-[#121214] border border-white/[0.06] p-7 flex flex-col">
+        <div class="flex items-center justify-between"><h3 class="text-[18px] font-semibold">Starter</h3><span class="text-[11px] font-mono px-2 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400">For freelancers</span></div>
+        <div class="mt-5 flex items-baseline gap-2"><span class="text-[36px] font-bold tracking-tight price" data-monthly="49" data-yearly="39">$49</span><span class="text-zinc-500 text-[14px]">/mo</span></div>
+        <p class="mt-2 text-[13px] text-zinc-500">Perfect to capture every lead and book your first 50 meetings/mo.</p>
+        <ul class="mt-6 space-y-3 text-[13px] text-zinc-300 flex-1">
+          <li class="flex gap-2.5"><span class="text-emerald-400">✓</span> 1,000 contacts included</li>
+          <li class="flex gap-2.5"><span class="text-emerald-400">✓</span> Missed-call text-back</li>
+          <li class="flex gap-2.5"><span class="text-emerald-400">✓</span> 2 calendars + booking links</li>
+          <li class="flex gap-2.5"><span class="text-emerald-400">✓</span> Unified inbox (SMS/Email)</li>
+          <li class="flex gap-2.5 text-zinc-500"><span class="text-zinc-600">✕</span> Funnel builder (1 page)</li>
+          <li class="flex gap-2.5 text-zinc-500"><span class="text-zinc-600">✕</span> Workflows (3 active)</li>
+        </ul>
+        <a href="#contact" class="mt-7 w-full py-3 rounded-full bg-white/[0.06] border border-white/[0.08] hover:bg-white/[0.1] text-center text-[14px] font-semibold transition">Start Free Trial</a>
+      </div>
+
+      <!-- Growth - Popular -->
+      <div class="reveal rounded-[24px] bg-[#151517] border border-brand-500/40 p-7 flex flex-col relative shadow-[0_0_50px_rgba(139,92,246,0.15)] lg:scale-[1.03] lg:-mt-3" style="transition-delay:80ms">
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-brand-500 to-indigo-600 text-[11px] font-bold tracking-widest text-white shadow-lg">MOST POPULAR</div>
+        <div class="flex items-center justify-between"><h3 class="text-[18px] font-semibold">Growth</h3><span class="text-[11px] font-mono px-2 py-1 rounded-full bg-brand-500/15 border border-brand-500/20 text-brand-300">For agencies</span></div>
+        <div class="mt-5 flex items-baseline gap-2"><span class="text-[36px] font-bold tracking-tight price" data-monthly="149" data-yearly="119">$149</span><span class="text-zinc-500 text-[14px]">/mo</span></div>
+        <p class="mt-2 text-[13px] text-zinc-400">Everything to run client acquisition on autopilot. Unlimited funnels & workflows.</p>
+        <ul class="mt-6 space-y-3 text-[13px] text-zinc-200 flex-1">
+          <li class="flex gap-2.5"><span class="text-emerald-400">✓</span> 10,000 contacts • Unlimited users</li>
+          <li class="flex gap-2.5"><span class="text-emerald-400">✓</span> <span class="font-medium text-white">AI nurture + human handoff</span></li>
+          <li class="flex gap-2.5"><span class="text-emerald-400">✓</span> Unlimited calendars & funnels</li>
+          <li class="flex gap-2.5"><span class="text-emerald-400">✓</span> Attribution + call tracking</li>
+          <li class="flex gap-2.5"><span class="text-emerald-400">✓</span> 5 sub-accounts for clients</li>
+          <li class="flex gap-2.5"><span class="text-emerald-400">✓</span> Priority support + onboarding</li>
+        </ul>
+        <a href="#contact" class="mt-7 btn-primary w-full py-3 rounded-full text-center text-[14px] font-semibold text-white">Start Free Trial →</a>
+        <div class="mt-3 text-center text-[11px] text-zinc-500">14-day trial • 47 agencies joined this week</div>
+      </div>
+
+      <!-- Agency -->
+      <div class="reveal rounded-[24px] bg-[#121214] border border-white/[0.06] p-7 flex flex-col" style="transition-delay:160ms">
+        <div class="flex items-center justify-between"><h3 class="text-[18px] font-semibold">Agency Scale</h3><span class="text-[11px] font-mono px-2 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400">For teams</span></div>
+        <div class="mt-5 flex items-baseline gap-2"><span class="text-[36px] font-bold tracking-tight price" data-monthly="399" data-yearly="319">$399</span><span class="text-zinc-500 text-[14px]">/mo</span></div>
+        <p class="mt-2 text-[13px] text-zinc-500">White-label, API, and unlimited everything. For teams scaling past 7 figures.</p>
+        <ul class="mt-6 space-y-3 text-[13px] text-zinc-300 flex-1">
+          <li class="flex gap-2.5"><span class="text-emerald-400">✓</span> Unlimited contacts & sub-accounts</li>
+          <li class="flex gap-2.5"><span class="text-emerald-400">✓</span> White-label app + domain</li>
+          <li class="flex gap-2.5"><span class="text-emerald-400">✓</span> API + webhooks + custom actions</li>
+          <li class="flex gap-2.5"><span class="text-emerald-400">✓</span> Dedicated success manager</li>
+          <li class="flex gap-2.5"><span class="text-emerald-400">✓</span> SAML SSO + advanced security</li>
+          <li class="flex gap-2.5"><span class="text-emerald-400">✓</span> Migration from GHL included</li>
+        </ul>
+        <a href="#contact" class="mt-7 w-full py-3 rounded-full bg-white text-black hover:bg-zinc-100 text-center text-[14px] font-semibold transition">Book Custom Demo</a>
+      </div>
+    </div>
+
+    <div class="mt-10 text-center text-[12px] text-zinc-500 reveal">✓ 14-day free trial • ✓ No credit card • ✓ Cancel anytime • ✓ Migration from GoHighLevel free</div>
+  </div>
+</section>
+
+<!-- LEAD CAPTURE -->
+<section id="contact" class="relative py-20 lg:py-28 border-t border-white/[0.06] bg-[#0E0E10]">
+  <div class="mx-auto max-w-[1200px] px-6 lg:px-8">
+    <div class="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-16 items-start">
+      <div class="reveal">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-mono tracking-widest text-emerald-300">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          3 SPOTS LEFT THIS WEEK
+        </div>
+        <h2 class="mt-5 text-[32px] lg:text-[44px] font-bold leading-[0.95] tracking-tight">Get your Agency OS live in <span class="gradient-text">7 minutes</span></h2>
+        <p class="mt-4 text-[16px] leading-[1.6] text-zinc-400 max-w-[520px]">Book a 15-min setup call or start free instantly. We'll migrate your contacts, calendars, and workflows from GHL, Calendly, ActiveCampaign — free.</p>
+
+        <div class="mt-8 grid sm:grid-cols-2 gap-4">
+          <div class="rounded-xl bg-[#151517] border border-white/[0.06] p-4 flex gap-3">
+            <div class="w-9 h-9 rounded-lg bg-white/[0.06] flex items-center justify-center text-[16px]">⚡</div>
+            <div><div class="text-[13px] font-semibold">7-min setup</div><div class="text-[12px] text-zinc-500 mt-0.5">Import contacts, connect domain, go live. No dev needed.</div></div>
+          </div>
+          <div class="rounded-xl bg-[#151517] border border-white/[0.06] p-4 flex gap-3">
+            <div class="w-9 h-9 rounded-lg bg-white/[0.06] flex items-center justify-center text-[16px]">🛡️</div>
+            <div><div class="text-[13px] font-semibold">Risk-free</div><div class="text-[12px] text-zinc-500 mt-0.5">14-day trial, cancel anytime. Keep your data if you leave.</div></div>
+          </div>
+        </div>
+
+        <div class="mt-8 flex items-center gap-4">
+          <img src="https://i.pravatar.cc/32?img=20" class="w-9 h-9 rounded-full"/>
+          <div class="text-[13px] leading-tight"><div class="font-medium">Alex — Onboarding Specialist</div><div class="text-zinc-500">Average response • 2 min • Online now</div></div>
+          <div class="ml-auto hidden sm:flex items-center gap-2 text-[11px] px-3 py-1.5 rounded-full bg-[#1A1A1E] border border-white/[0.08]"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Live chat</div>
+        </div>
+
+        <div class="mt-10 p-4 rounded-xl bg-[#121214] border border-white/[0.06] flex gap-3">
+          <div class="text-[20px]">💬</div>
+          <div class="text-[13px] leading-[1.5] text-zinc-300">“I was skeptical about another ‘all-in-one’. But LeadPulse actually <span class="text-white font-medium">books while I sleep</span>. 11 meetings this week from old leads we thought were dead.”<div class="mt-2 text-[12px] text-zinc-500">— Priya S., 2-person agency, London</div></div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="reveal lg:sticky lg:top-[96px]" style="transition-delay:120ms">
+        <div class="rounded-[24px] bg-[#151517] border border-white/[0.08] p-6 lg:p-8 shadow-[0_20px_80px_rgba(0,0,0,0.5)] relative overflow-hidden">
+          <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+          <h3 class="text-[20px] font-bold tracking-tight">Start your free trial</h3>
+          <p class="mt-1.5 text-[13px] text-zinc-500">No credit card. Full access for 14 days.</p>
+
+          <form id="leadForm" class="mt-6 space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="text-[11px] font-medium tracking-widest text-zinc-500 uppercase">Full Name</label>
+                <input required name="name" placeholder="Alex Morgan" class="mt-2 w-full h-11 px-4 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[14px] placeholder:text-zinc-600 focus:outline-none focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20 transition"/>
+              </div>
+              <div>
+                <label class="text-[11px] font-medium tracking-widest text-zinc-500 uppercase">Business Name</label>
+                <input required name="business" placeholder="ScaleHouse" class="mt-2 w-full h-11 px-4 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[14px] placeholder:text-zinc-600 focus:outline-none focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20 transition"/>
+              </div>
+            </div>
+            <div>
+              <label class="text-[11px] font-medium tracking-widest text-zinc-500 uppercase">Work Email</label>
+              <input required type="email" name="email" placeholder="alex@scalehouse.co" class="mt-2 w-full h-11 px-4 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[14px] placeholder:text-zinc-600 focus:outline-none focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20 transition"/>
+            </div>
+            <div>
+              <label class="text-[11px] font-medium tracking-widest text-zinc-500 uppercase">Phone (for SMS demo)</label>
+              <input required type="tel" name="phone" placeholder="+44 7XXX XXXXXX" class="mt-2 w-full h-11 px-4 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[14px] placeholder:text-zinc-600 focus:outline-none focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20 transition"/>
+            </div>
+            <div>
+              <label class="text-[11px] font-medium tracking-widest text-zinc-500 uppercase">Monthly Leads</label>
+              <select name="volume" class="mt-2 w-full h-11 px-4 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[14px] text-zinc-300 focus:outline-none focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20 transition">
+                <option>10-50 leads / mo</option>
+                <option selected>50-200 leads / mo</option>
+                <option>200-500 leads / mo</option>
+                <option>500+ leads / mo</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn-primary w-full h-12 rounded-full font-semibold text-[15px] text-white flex items-center justify-center gap-2">
+              <span id="btnText">Get Instant Access →</span>
+              <svg id="btnSpinner" class="hidden animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+            </button>
+
+            <div class="flex items-center justify-center gap-2 text-[11px] text-zinc-500">
+              <span class="w-3 h-3 rounded-full border border-zinc-600 flex items-center justify-center text-[8px]">✓</span>
+              GDPR compliant • No spam • Unsubscribe anytime
+            </div>
+          </form>
+
+          <div class="mt-6 pt-5 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-zinc-500">
+            <span class="flex items-center gap-1.5"><span class="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center">🔒</span> SOC 2 • Encrypted</span>
+            <span>⚡ Setup in 7 min</span>
+            <span>💬 Live support</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-white/[0.06] bg-[#0A0A0B] py-12">
+  <div class="mx-auto max-w-[1200px] px-6 lg:px-8">
+    <div class="flex flex-col lg:flex-row justify-between gap-10">
+      <div>
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+          <span class="font-bold">LeadPulse</span>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-500">AGENCY OS</span>
+        </div>
+        <p class="mt-3 text-[13px] leading-[1.6] text-zinc-500 max-w-[320px]">The Agency OS that captures every lead, books meetings on autopilot, and turns follow-up into revenue. Built for agencies who hate losing deals.</p>
+        <div class="mt-5 flex gap-2">
+          <a href="#" class="w-8 h-8 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center hover:bg-white/[0.1] transition"><span class="text-[12px]">𝕏</span></a>
+          <a href="#" class="w-8 h-8 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center hover:bg-white/[0.1] transition"><span class="text-[12px]">in</span></a>
+          <a href="#" class="w-8 h-8 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center hover:bg-white/[0.1] transition"><span class="text-[12px]">▶</span></a>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-10 text-[13px]">
+        <div><div class="font-semibold text-white mb-3">Product</div><div class="space-y-2.5 text-zinc-500"><a href="#features" class="block hover:text-white">Features</a><a href="#pricing" class="block hover:text-white">Pricing</a><a href="#calculator" class="block hover:text-white">ROI Calculator</a><a href="#" class="block hover:text-white">Changelog</a></div></div>
+        <div><div class="font-semibold text-white mb-3">Resources</div><div class="space-y-2.5 text-zinc-500"><a href="#" class="block hover:text-white">Migration from GHL</a><a href="#" class="block hover:text-white">Help Center</a><a href="#" class="block hover:text-white">API Docs</a><a href="#" class="block hover:text-white">Templates</a></div></div>
+        <div><div class="font-semibold text-white mb-3">Legal</div><div class="space-y-2.5 text-zinc-500"><a href="#" class="block hover:text-white">Privacy Policy</a><a href="#" class="block hover:text-white">Terms of Service</a><a href="#" class="block hover:text-white">DPA</a><a href="#" class="block hover:text-white">Contact</a></div></div>
+      </div>
+    </div>
+
+    <div class="mt-12 pt-8 border-t border-white/[0.06] flex flex-col sm:flex-row justify-between gap-3 text-[12px] text-zinc-600">
+      <span>© 2026 LeadPulse Inc. All rights reserved. Built for agencies who close.</span>
+      <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> All systems operational • 99.99% uptime</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast -->
+<div id="toastContainer" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] pointer-events-none flex flex-col gap-2 items-center"></div>
+
+<script>
+// Icons
+lucide.createIcons();
+
+// Header scroll
+const header = document.getElementById('header');
+const progress = document.getElementById('scrollProgress');
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY;
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  progress.style.width = (scrolled / max * 100) + '%';
+  if (scrolled > 20) {
+    header.classList.add('bg-[#0A0A0B]/80','backdrop-blur-xl','border-white/[0.06]');
+    header.classList.remove('border-transparent');
+  } else {
+    header.classList.remove('bg-[#0A0A0B]/80','backdrop-blur-xl','border-white/[0.06]');
+    header.classList.add('border-transparent');
+  }
+});
+
+// Mobile menu
+const menuBtn = document.getElementById('mobileMenuBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>mobileMenu.classList.add('hidden')));
+
+// Reveal on scroll
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
+},{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+// Calculator
+const leadsInput = document.getElementById('input-leads');
+const closeInput = document.getElementById('input-close');
+const dealInput = document.getElementById('input-deal');
+const valLeads = document.getElementById('val-leads');
+const valClose = document.getElementById('val-close');
+const valDeal = document.getElementById('val-deal');
+const outCurrent = document.getElementById('out-current');
+const outProjected = document.getElementById('out-projected');
+const outExtra = document.getElementById('out-extra');
+const outAnnual = document.getElementById('out-annual');
+const outCurrentRate = document.getElementById('out-current-rate');
+const outProjectedRate = document.getElementById('out-projected-rate');
+const outRecovered = document.getElementById('out-recovered');
+const outMeetings = document.getElementById('out-meetings');
+
+function formatMoney(n){
+  if(n>=1000000) return '$'+(n/1000000).toFixed(1)+'M';
+  if(n>=1000) return '$'+(n/1000).toFixed(n>=10000?0:1)+'k';
+  return '$'+Math.round(n).toLocaleString();
+}
+function calc(){
+  const leads = parseInt(leadsInput.value);
+  const close = parseInt(closeInput.value)/100;
+  const deal = parseInt(dealInput.value);
+  const current = leads * close * deal;
+  const recoveredLeads = Math.round(leads * 0.27);
+  const totalLeadsEffective = leads + recoveredLeads;
+  const newClose = Math.min(0.85, close + 0.15);
+  const projected = totalLeadsEffective * newClose * deal;
+  const extra = projected - current;
+
+  valLeads.textContent = leads;
+  valClose.textContent = Math.round(close*100)+'%';
+  valDeal.textContent = '$'+deal.toLocaleString();
+  outCurrent.textContent = formatMoney(current);
+  outProjected.textContent = formatMoney(projected);
+  outExtra.textContent = '+'+formatMoney(extra);
+  outAnnual.textContent = '+'+formatMoney(extra*12)+' / year';
+  outCurrentRate.textContent = Math.round(close*100)+'%';
+  outProjectedRate.textContent = Math.round(newClose*100)+'%';
+  outRecovered.textContent = recoveredLeads + ' leads';
+  outMeetings.textContent = '+'+Math.round(recoveredLeads * newClose + leads*0.15)+' / mo';
+}
+[leadsInput,closeInput,dealInput].forEach(i=>i.addEventListener('input',calc));
+calc();
+
+// Pricing toggle
+const monthlyBtn = document.getElementById('billing-monthly');
+const yearlyBtn = document.getElementById('billing-yearly');
+function setBilling(mode){
+  document.querySelectorAll('.price').forEach(el=>{
+    el.textContent = '$'+ (mode==='monthly' ? el.dataset.monthly : el.dataset.yearly);
+  });
+  if(mode==='monthly'){
+    monthlyBtn.className='px-5 py-2 rounded-full text-[13px] font-medium bg-white text-black';
+    yearlyBtn.className='px-5 py-2 rounded-full text-[13px] font-medium text-zinc-400 hover:text-white';
+  }else{
+    yearlyBtn.className='px-5 py-2 rounded-full text-[13px] font-medium bg-white text-black';
+    monthlyBtn.className='px-5 py-2 rounded-full text-[13px] font-medium text-zinc-400 hover:text-white';
+  }
+}
+monthlyBtn.addEventListener('click',()=>setBilling('monthly'));
+yearlyBtn.addEventListener('click',()=>setBilling('yearly'));
+
+// Toast helper
+function showToast(title, msg, type='success'){
+  const container = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = 'toast-enter pointer-events-auto min-w-[340px] max-w-[90vw] rounded-2xl bg-[#1A1A1E] border border-white/[0.08] shadow-[0_20px_60px_rgba(0,0,0,0.6)] p-4 flex gap-3';
+  el.innerHTML = `
+    <div class="w-9 h-9 rounded-full ${type==='success'?'bg-emerald-500/15 border border-emerald-500/20 text-emerald-400':'bg-red-500/15 border border-red-500/20 text-red-400'} flex items-center justify-center text-[14px]">${type==='success'?'✓':'!'}</div>
+    <div class="flex-1"><div class="text-[13px] font-semibold text-white">${title}</div><div class="text-[12px] text-zinc-400 mt-0.5 leading-[1.4]">${msg}</div></div>
+    <button onclick="this.parentElement.remove()" class="text-zinc-600 hover:text-zinc-300">✕</button>
+  `;
+  container.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateY(10px)'; setTimeout(()=>el.remove(),300); }, 4500);
+}
+
+// Form submit
+const form = document.getElementById('leadForm');
+const btnText = document.getElementById('btnText');
+const btnSpinner = document.getElementById('btnSpinner');
+form.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  btnText.textContent = 'Creating your workspace...';
+  btnSpinner.classList.remove('hidden');
+  form.querySelector('button').disabled = true;
+  form.querySelector('button').classList.add('opacity-80','cursor-not-allowed');
+
+  // Simulate API
+  await new Promise(r=>setTimeout(r, 1200));
+
+  const data = Object.fromEntries(new FormData(form).entries());
+  console.log('Lead submitted', data);
+
+  showToast('Workspace created 🎉', `Check your email at ${data.email} — we sent your magic login link + SMS demo to ${data.phone}.`, 'success');
+  form.reset();
+  btnText.textContent = 'Get Instant Access →';
+  btnSpinner.classList.add('hidden');
+  form.querySelector('button').disabled = false;
+  form.querySelector('button').classList.remove('opacity-80','cursor-not-allowed');
+
+  // Confetti-ish
+  for(let i=0;i<6;i++){
+    setTimeout(()=>{
+      const dot = document.createElement('div');
+      dot.className='fixed w-1.5 h-1.5 rounded-full bg-brand-400 z-[99]';
+      dot.style.left = (50+ (Math.random()-0.5)*30)+'%';
+      dot.style.top = '60%';
+      dot.style.transition='all 0.9s cubic-bezier(0.16,1,0.3,1)';
+      document.body.appendChild(dot);
+      requestAnimationFrame(()=>{ dot.style.transform=`translate(${(Math.random()-0.5)*300}px, -${200+Math.random()*200}px)`; dot.style.opacity='0'; });
+      setTimeout(()=>dot.remove(),1000);
+    }, i*80);
+  }
+});
+
+// Smooth scroll offset for fixed header
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click', (e)=>{
+    const id = a.getAttribute('href');
+    if(id.length>1){
+      const target = document.querySelector(id);
+      if(target){
+        e.preventDefault();
+        const top = target.getBoundingClientRect().top + window.scrollY - 84;
+        window.scrollTo({top, behavior:'smooth'});
+      }
+    }
+  });
+});
+</script>
+</body>
+</html>
