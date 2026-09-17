@@ -188,17 +188,94 @@ body{background:#0A0A0B}
 </div>
 </section>
 
+<!-- Paywall Modal for $49/mo -->
+<div id="paywallModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="document.getElementById('paywallModal').classList.add('hidden')"></div>
+  <div class="relative w-full max-w-[480px] rounded-[24px] bg-[#151517] border border-white/[0.08] p-7 shadow-[0_20px_80px_rgba(0,0,0,0.8)]">
+    <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-500/50 to-transparent"></div>
+    <div class="flex items-center justify-between">
+      <div class="inline-flex px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-[11px] font-mono text-amber-300">🔒 PRO REQUIRED — $49/MO</div>
+      <button onclick="document.getElementById('paywallModal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center">✕</button>
+    </div>
+    <h2 class="mt-4 text-[22px] font-bold leading-[1.1]">Unlock unlimited hunts on 12 APIs</h2>
+    <p class="mt-2 text-[13px] leading-[1.6] text-zinc-400">Free tier: 3 hunts + 5 saved leads. Pro gives you unlimited hunts, 12 Q&A sources, unlimited saves, Systeme.io auto-push, CSV export, and YouTube/Twitter/Quora APIs.</p>
+
+    <div class="mt-5 grid grid-cols-2 gap-3">
+      <div class="rounded-xl bg-[#0F0F10] border border-white/[0.06] p-3"><div class="text-[11px] text-zinc-500 uppercase">Free</div><div class="text-[18px] font-bold mt-1">$0</div><div class="text-[11px] text-zinc-500 mt-1">3 hunts, 5 saves, 7 FREE APIs, demo data</div></div>
+      <div class="rounded-xl bg-gradient-to-br from-brand-600/20 to-indigo-600/20 border border-brand-500/30 p-3"><div class="text-[11px] text-brand-300 uppercase">Pro — Most Popular</div><div class="text-[18px] font-bold mt-1">$49/mo</div><div class="text-[11px] text-brand-300 mt-1">Unlimited, 12 APIs, Systeme.io, CSV</div></div>
+    </div>
+
+    <div class="mt-6 space-y-2.5">
+      <a id="stripeCheckoutBtn" href="#" target="_blank" class="btn-primary w-full h-11 rounded-full flex items-center justify-center gap-2 font-semibold text-[14px] text-white">Subscribe $49/mo with Stripe →</a>
+      <a id="sioCheckoutBtn" href="#" target="_blank" class="w-full h-11 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center gap-2 font-medium text-[13px] hover:bg-white/[0.1]">Or Pay with Systeme.io →</a>
+      <div class="flex gap-2">
+        <input id="licenseInput" placeholder="Have license key? Paste here" class="flex-1 h-10 px-4 rounded-full bg-[#0F0F10] border border-white/[0.08] text-[12px] font-mono"/>
+        <button id="licenseBtn" class="px-5 h-10 rounded-full bg-white text-black text-[12px] font-semibold">Unlock</button>
+      </div>
+      <div class="text-center text-[11px] text-zinc-500">After payment, you'll be redirected back with Pro access. Or add <code class="px-1 py-0.5 rounded bg-white/[0.08]">?access=pro</code> to URL to unlock if you have Systeme.io membership.</div>
+    </div>
+
+    <div class="mt-5 pt-4 border-t border-white/[0.06] text-[11px] text-zinc-500">
+      <div>✓ Cancel anytime • ✓ 7-day money back • ✓ Works on GitHub Pages • ✓ No backend needed</div>
+      <div class="mt-2">Already paid? Add <code class="px-1.5 py-0.5 rounded bg-white/[0.08] text-zinc-300">?access=pro</code> to your URL or enter license key above.</div>
+    </div>
+  </div>
+</div>
+
 <footer class="border-t border-white/[0.06] py-8 text-center text-[11px] text-zinc-600">
-  LeadHunter Pro — 12 APIs: Reddit, HN, StackOverflow, Dev.to, Hashnode, Lobste.rs, Product Hunt, Indie Hackers, GitHub, YouTube, Twitter, Quora • Systeme.io ready • <a href="?admin=1" class="underline decoration-dotted">Admin</a>
+  <div class="flex flex-col sm:flex-row items-center justify-center gap-2">
+    <span>LeadHunter Pro — 12 APIs: Reddit, HN, StackOverflow, Dev.to, Hashnode, Lobste.rs, Product Hunt, Indie Hackers, GitHub, YouTube, Twitter, Quora • Systeme.io ready • <a href="?admin=1" class="underline decoration-dotted">Admin</a></span>
+    <span id="freeBadge" class="px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400">Free: <span id="freeHuntCount">0</span>/3 hunts • <span id="freeSaveCount">0</span>/5 saves</span>
+    <span id="proBadge" class="hidden px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/20 text-emerald-400">✅ Pro $49/mo — Unlimited</span>
+  </div>
 </footer>
 
 <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] hidden px-4 py-3 rounded-full bg-[#1A1A1E] border border-white/[0.08] text-[13px] shadow-xl"></div>
 
 <script>
+// Subscription Config - $49/mo SaaS
+const SUBSCRIPTION_CONFIG = {
+  price: 49,
+  stripePaymentLink: "", // PASTE YOUR STRIPE LINK: https://buy.stripe.com/xxx
+  systemeIoLink: "", // PASTE SYSTEME.IO CHECKOUT LINK
+  freeHunts: 3,
+  freeSaves: 5,
+  proParam: "pro"
+};
+
 // State
 let allLeads = [];
 let savedLeads = JSON.parse(localStorage.getItem('leadhunter_saved')||'[]');
 let isHunting = false;
+let huntCount = parseInt(localStorage.getItem('leadhunter_huntCount')||'0');
+
+function isProUser(){
+  const params = new URLSearchParams(location.search);
+  if(params.get('access')===SUBSCRIPTION_CONFIG.proParam || params.get('paid')==='1' || params.get('access')==='paid') return true;
+  if(localStorage.getItem('leadhunter_pro')==='true') return true;
+  return false;
+}
+function checkPaywall(){
+  if(isProUser()) return false;
+  const hunts = parseInt(localStorage.getItem('leadhunter_huntCount')||'0');
+  const saves = savedLeads.length;
+  if(hunts >= SUBSCRIPTION_CONFIG.freeHunts || saves >= SUBSCRIPTION_CONFIG.freeSaves){
+    showPaywall();
+    return true;
+  }
+  return false;
+}
+function showPaywall(){
+  const modal = document.getElementById('paywallModal');
+  if(modal) modal.classList.remove('hidden');
+}
+function unlockPro(){
+  localStorage.setItem('leadhunter_pro','true');
+  document.getElementById('paywallModal')?.classList.add('hidden');
+  document.getElementById('proBadge')?.classList.remove('hidden');
+  document.getElementById('freeBadge')?.classList.add('hidden');
+  showToast('✅ Pro unlocked — unlimited hunts + 12 APIs!');
+}
 let sioConfig = JSON.parse(localStorage.getItem('leadhunter_sio')||'{"apiKey":"","tag":"reddit-lead","webhook":"","auto":"off"}');
 let apiKeys = JSON.parse(localStorage.getItem('leadhunter_keys')||'{"yt":"","tw":"","serp":"","ph":"","gh":""}');
 
@@ -341,7 +418,26 @@ function renderSaved(){ const list=document.getElementById('savedList'); if(!sav
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'),3000); }
 function copyOutreach(btn){ const text=btn.getAttribute('data-text'); navigator.clipboard.writeText(text); showToast('Copied outreach'); btn.textContent='Copied ✓'; setTimeout(()=>btn.textContent='Copy Outreach',1500); }
 function regenOutreach(btn,id){ const lead=allLeads.find(l=>l.id===id); if(!lead) return; const offer=document.getElementById('offerInput').value; const newText=generateOutreach(lead,offer); const container=btn.closest('.p-3'); container.querySelector('.text-zinc-300').textContent=newText; container.querySelector('[data-text]').setAttribute('data-text',newText); }
-async function toggleSave(id){ const lead=allLeads.find(l=>l.id===id)||savedLeads.find(l=>l.id===id); if(!lead) return; const exists=savedLeads.findIndex(s=>s.id===id); if(exists>=0){ savedLeads.splice(exists,1); showToast('Removed'); } else { savedLeads.unshift({...lead,saved_at:new Date().toISOString()}); showToast('Saved ★'+(sioConfig.auto==='on'&&(sioConfig.apiKey||sioConfig.webhook)?' → pushing to Systeme.io...':'')); if(sioConfig.auto==='on'&&(sioConfig.apiKey||sioConfig.webhook)){ const res=await pushToSystemeIo(lead); if(res.success) showToast('✅ Pushed to Systeme.io tag '+sioConfig.tag); else showToast('Saved locally, Systeme.io failed: '+(res.apiError||res.webhookError||'')); } } localStorage.setItem('leadhunter_saved',JSON.stringify(savedLeads)); updateSavedCount(); renderLeads(allLeads); if(!document.getElementById('savedDrawer').classList.contains('hidden')) renderSaved(); }
+function updateFreeBadges(){
+  const hc = parseInt(localStorage.getItem('leadhunter_huntCount')||'0');
+  const sc = savedLeads.length;
+  const huntEl = document.getElementById('freeHuntCount');
+  const saveEl = document.getElementById('freeSaveCount');
+  if(huntEl) huntEl.textContent = hc;
+  if(saveEl) saveEl.textContent = sc;
+  if(isProUser()){
+    document.getElementById('freeBadge')?.classList.add('hidden');
+    document.getElementById('proBadge')?.classList.remove('hidden');
+  }
+}
+
+async function toggleSave(id){
+  // Check paywall for saves
+  if(!isProUser() && savedLeads.length >= SUBSCRIPTION_CONFIG.freeSaves){
+    showPaywall();
+    return;
+  }
+  const lead=allLeads.find(l=>l.id===id)||savedLeads.find(l=>l.id===id); if(!lead) return; const exists=savedLeads.findIndex(s=>s.id===id); if(exists>=0){ savedLeads.splice(exists,1); showToast('Removed'); } else { savedLeads.unshift({...lead,saved_at:new Date().toISOString()}); showToast('Saved ★'+(sioConfig.auto==='on'&&(sioConfig.apiKey||sioConfig.webhook)?' → pushing to Systeme.io...':'')); if(sioConfig.auto==='on'&&(sioConfig.apiKey||sioConfig.webhook)){ const res=await pushToSystemeIo(lead); if(res.success) showToast('✅ Pushed to Systeme.io tag '+sioConfig.tag); else showToast('Saved locally, Systeme.io failed: '+(res.apiError||res.webhookError||'')); } } localStorage.setItem('leadhunter_saved',JSON.stringify(savedLeads)); updateSavedCount(); updateFreeBadges(); renderLeads(allLeads); if(!document.getElementById('savedDrawer').classList.contains('hidden')) renderSaved(); }
 async function manualPushToSio(id){ const lead=allLeads.find(l=>l.id===id)||savedLeads.find(l=>l.id===id); if(!lead) return; showToast('Pushing to Systeme.io...'); const res=await pushToSystemeIo(lead); if(res.success) showToast('✅ Sent to Systeme.io'); else showToast('❌ Failed: '+(res.apiError||res.webhookError||'config missing')); }
 
 function renderLeads(leads){
@@ -403,6 +499,8 @@ function renderLeads(leads){
 
 async function hunt(){
   if(isHunting) return;
+  // Check paywall for free users
+  if(!isProUser() && checkPaywall()) return;
   const keywords=document.getElementById('keywordsInput').value.trim();
   const offer=document.getElementById('offerInput').value.trim();
   const subreddits=document.getElementById('subredditsInput').value.trim();
@@ -411,6 +509,17 @@ async function hunt(){
   if(!keywords){ showToast('Enter keywords'); return; }
   if(!offer){ showToast('Enter your offer'); return; }
   if(!selectedSources.length){ showToast('Select at least one source'); return; }
+
+  // Increment hunt count for free tier
+  if(!isProUser()){
+    huntCount++;
+    localStorage.setItem('leadhunter_huntCount', huntCount.toString());
+    updateFreeBadges();
+    if(huntCount > SUBSCRIPTION_CONFIG.freeHunts){
+      showPaywall();
+      return;
+    }
+  }
 
   isHunting=true;
   document.getElementById('huntText').textContent=`Hunting ${selectedSources.length} sources...`;
@@ -503,10 +612,59 @@ document.getElementById('saveKeysBtn')?.addEventListener('click',()=>{ apiKeys={
 document.getElementById('sioSaveBtn')?.addEventListener('click',saveSioConfig);
 document.getElementById('sioTestBtn')?.addEventListener('click',async()=>{ saveSioConfig(); if(!sioConfig.apiKey&&!sioConfig.webhook){ showToast('Add API key or webhook'); return; } showToast('Testing...'); const testLead={id:'test',title:'Test lead from LeadHunter Pro 12 APIs',snippet:'Test to verify Systeme.io',url:'https://fatahsystem7-glitch.github.io/lead-capture-agency/',author:'test_user',subreddit:'test',score:10,num_comments:1,created_utc:Date.now()/1000,intent:{score:85,level:'high'},matched:['test']}; const res=await pushToSystemeIo(testLead); if(res.success) showToast('✅ Systeme.io connected!'); else showToast('❌ Failed: '+(res.apiError||res.webhookError||'')); });
 
-// Init
+// Init + Paywall + Subscription
 (function init(){
   updateSavedCount();
   updateSioStatus();
+  updateFreeBadges();
+  // Check for pro access via URL params
+  const params = new URLSearchParams(location.search);
+  if(params.get('access')===SUBSCRIPTION_CONFIG.proParam || params.get('paid')==='1' || params.get('access')==='paid'){
+    unlockPro();
+    // Clean URL
+    history.replaceState(null,'',location.pathname);
+  }
+  if(isProUser()){
+    document.getElementById('freeBadge')?.classList.add('hidden');
+    document.getElementById('proBadge')?.classList.remove('hidden');
+  }
+  // Setup checkout buttons
+  const stripeBtn = document.getElementById('stripeCheckoutBtn');
+  const sioBtn = document.getElementById('sioCheckoutBtn');
+  if(stripeBtn){
+    if(SUBSCRIPTION_CONFIG.stripePaymentLink){
+      stripeBtn.href = SUBSCRIPTION_CONFIG.stripePaymentLink;
+    } else {
+      stripeBtn.addEventListener('click', (e)=>{
+        e.preventDefault();
+        showToast('Add your Stripe payment link in SUBSCRIPTION_CONFIG.stripePaymentLink — see SUBSCRIPTION_SETUP.md');
+        window.open('https://dashboard.stripe.com/products','_blank');
+      });
+    }
+  }
+  if(sioBtn){
+    if(SUBSCRIPTION_CONFIG.systemeIoLink){
+      sioBtn.href = SUBSCRIPTION_CONFIG.systemeIoLink;
+    } else {
+      sioBtn.addEventListener('click', (e)=>{
+        e.preventDefault();
+        showToast('Add your Systeme.io checkout link in SUBSCRIPTION_CONFIG.systemeIoLink');
+      });
+    }
+  }
+  // License key unlock
+  document.getElementById('licenseBtn')?.addEventListener('click', ()=>{
+    const key = document.getElementById('licenseInput')?.value.trim();
+    if(!key){ showToast('Enter license key'); return; }
+    // Simple check: any key containing 'pro' or length >10 unlocks (you can make it check against your DB via webhook)
+    if(key.toLowerCase().includes('pro') || key.length>=10){
+      unlockPro();
+      showToast('✅ License valid — Pro unlocked!');
+    } else {
+      showToast('❌ Invalid license key');
+    }
+  });
+
   const savedKeys=JSON.parse(localStorage.getItem('leadhunter_keys')||'{}');
   if(savedKeys.yt) document.getElementById('ytKey').value=savedKeys.yt;
   if(savedKeys.tw) document.getElementById('twKey').value=savedKeys.tw;
