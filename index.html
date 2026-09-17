@@ -111,6 +111,42 @@ body{background:#0A0A0B}
         </div>
       </div>
 
+      <!-- Systeme.io Integration -->
+      <div class="mt-5 p-4 rounded-[14px] bg-gradient-to-br from-blue-600/10 to-indigo-600/10 border border-blue-500/20">
+        <div class="flex items-center justify-between">
+          <h4 class="text-[11px] font-mono tracking-widest text-blue-300 uppercase">🔌 Systeme.io Plug-in</h4>
+          <span id="sioStatus" class="text-[10px] px-2 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400">Not connected</span>
+        </div>
+        <div class="mt-3 space-y-2.5">
+          <div>
+            <label class="text-[11px] text-zinc-400">Systeme.io API Key (for auto-create contacts)</label>
+            <input id="sioApiKey" type="password" placeholder="api_xxxxxxxx or leave blank for webhook only" class="mt-1 w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[12px] font-mono placeholder:text-zinc-600 focus:outline-none focus:border-blue-500/50"/>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[11px] text-zinc-400">Tag</label>
+              <input id="sioTag" placeholder="reddit-lead" value="reddit-lead" class="mt-1 w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[12px] placeholder:text-zinc-600 focus:outline-none focus:border-blue-500/50"/>
+            </div>
+            <div>
+              <label class="text-[11px] text-zinc-400">Auto-push?</label>
+              <select id="sioAuto" class="mt-1 w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[12px] text-zinc-300">
+                <option value="off">Off - manual only</option>
+                <option value="on">On - auto push on Save</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="text-[11px] text-zinc-400">Or Webhook URL (no API key needed) — from Systeme.io Workflows → Trigger: Incoming Webhook</label>
+            <input id="sioWebhook" placeholder="https://app.systeme.io/api/webhooks/xxx or Zapier webhook" class="mt-1 w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[12px] font-mono placeholder:text-zinc-600 focus:outline-none focus:border-blue-500/50"/>
+          </div>
+          <div class="flex gap-2">
+            <button id="sioSaveBtn" class="flex-1 h-8 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-semibold">Save & Connect</button>
+            <button id="sioTestBtn" class="px-3 h-8 rounded-full bg-white/[0.06] border border-white/[0.08] text-[11px] font-medium hover:bg-white/[0.1]">Test</button>
+          </div>
+          <div class="text-[10px] leading-[1.5] text-zinc-500">API key stored only in your browser (localStorage). Never sent to our server. GitHub Pages is static. For iframe embed in systeme.io funnel, use: <code class="px-1 py-0.5 rounded bg-white/[0.08] text-zinc-300">&lt;iframe src="https://fatahsystem7-glitch.github.io/lead-capture-agency/" width="100%" height="900"&gt;</code></div>
+        </div>
+      </div>
+
       <div class="mt-5 flex gap-2">
         <button id="huntBtn" class="btn-primary flex-1 h-11 rounded-full font-semibold text-[14px] text-white flex items-center justify-center gap-2">
           <span id="huntText">🎯 Hunt Leads Now</span>
@@ -210,6 +246,130 @@ body{background:#0A0A0B}
 let allLeads = [];
 let savedLeads = JSON.parse(localStorage.getItem('leadhunter_saved')||'[]');
 let isHunting = false;
+
+// Systeme.io Integration State
+let sioConfig = JSON.parse(localStorage.getItem('leadhunter_sio')||'{"apiKey":"","tag":"reddit-lead","webhook":"","auto":"off"}');
+
+function saveSioConfig(){
+  sioConfig = {
+    apiKey: document.getElementById('sioApiKey')?.value.trim() || '',
+    tag: document.getElementById('sioTag')?.value.trim() || 'reddit-lead',
+    webhook: document.getElementById('sioWebhook')?.value.trim() || '',
+    auto: document.getElementById('sioAuto')?.value || 'off'
+  };
+  localStorage.setItem('leadhunter_sio', JSON.stringify(sioConfig));
+  updateSioStatus();
+  showToast('Systeme.io config saved');
+}
+
+function updateSioStatus(){
+  const el = document.getElementById('sioStatus');
+  if(!el) return;
+  if(sioConfig.apiKey || sioConfig.webhook){
+    el.textContent = sioConfig.apiKey ? '✅ API connected' : '✅ Webhook connected';
+    el.className = 'text-[10px] px-2 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/20 text-emerald-400';
+  } else {
+    el.textContent = 'Not connected';
+    el.className = 'text-[10px] px-2 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400';
+  }
+  // Fill inputs
+  const apiIn = document.getElementById('sioApiKey');
+  const tagIn = document.getElementById('sioTag');
+  const webIn = document.getElementById('sioWebhook');
+  const autoIn = document.getElementById('sioAuto');
+  if(apiIn && !apiIn.value) apiIn.value = sioConfig.apiKey;
+  if(tagIn) tagIn.value = sioConfig.tag;
+  if(webIn && !webIn.value) webIn.value = sioConfig.webhook;
+  if(autoIn) autoIn.value = sioConfig.auto;
+}
+
+async function pushToSystemeIo(lead){
+  const config = sioConfig;
+  if(!config.apiKey && !config.webhook){
+    showToast('Connect Systeme.io first — add API key or webhook URL in left panel');
+    return { success:false, error:'not configured' };
+  }
+
+  // Prepare payload
+  const outreach = generateOutreach(lead, document.getElementById('offerInput').value);
+  const payload = {
+    email: `${lead.author}@reddit.lead`.replace(/[^a-zA-Z0-9@._-]/g,''),
+    firstName: lead.author || 'Reddit Lead',
+    lastName: lead.subreddit || '',
+    source: 'LeadHunter',
+    reddit_post: lead.title,
+    subreddit: lead.subreddit,
+    post_url: lead.url,
+    intent_score: lead.intent.score,
+    intent_level: lead.intent.level,
+    matched_keywords: (lead.matched||[]).join(', '),
+    snippet: lead.snippet,
+    outreach_message: outreach,
+    author: lead.author,
+    saved_at: new Date().toISOString(),
+    tag: config.tag
+  };
+
+  let result = { success:false };
+
+  // Try webhook first if present (works for Systeme.io workflows, Zapier, Make)
+  if(config.webhook){
+    try {
+      const res = await fetch(config.webhook, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if(res.ok){
+        result.webhook = true;
+        result.success = true;
+      } else {
+        result.webhookError = `Webhook ${res.status}`;
+      }
+    } catch(e){
+      result.webhookError = e.message;
+    }
+  }
+
+  // Try direct Systeme.io API if key present
+  if(config.apiKey){
+    try {
+      // Systeme.io API: POST https://api.systeme.io/api/contacts
+      const res = await fetch('https://api.systeme.io/api/contacts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': config.apiKey
+        },
+        body: JSON.stringify({
+          email: payload.email,
+          firstName: payload.firstName,
+          lastName: payload.lastName,
+          fields: [
+            { slug: 'reddit_post', value: payload.reddit_post?.slice(0,255) },
+            { slug: 'subreddit', value: payload.subreddit },
+            { slug: 'post_url', value: payload.post_url },
+            { slug: 'intent_score', value: String(payload.intent_score) },
+            { slug: 'outreach_message', value: payload.outreach_message?.slice(0,500) }
+          ],
+          tags: [{ name: config.tag }]
+        })
+      });
+      const data = await res.json().catch(()=>({}));
+      if(res.ok){
+        result.api = true;
+        result.success = true;
+      } else {
+        result.apiError = data.message || `API ${res.status}`;
+        // If 401, API key invalid
+      }
+    } catch(e){
+      result.apiError = e.message;
+    }
+  }
+
+  return result;
+}
 
 const INTENT_PHRASES = {
   looking: ['looking for','looking to','searching for','recommend','recommendation','suggest','any recommendations','what do you use for'],
@@ -418,10 +578,11 @@ function renderLeads(leads){
           <div class="mt-3 p-3 rounded-xl bg-[#0F0F10] border border-white/[0.06]">
             <div class="text-[11px] font-mono tracking-widest text-zinc-500 uppercase">Position Your Offer → Copy & Paste</div>
             <div class="mt-2 text-[12px] leading-[1.6] text-zinc-300">${outreach}</div>
-            <div class="mt-3 flex gap-2">
+            <div class="mt-3 flex flex-wrap gap-2">
               <button onclick="copyOutreach(this)" data-text="${outreach.replace(/"/g,'&quot;')}" class="px-3 py-1.5 rounded-full bg-white text-black text-[11px] font-semibold hover:bg-zinc-100">Copy Outreach</button>
               <a href="${lead.url}" target="_blank" class="px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-[11px] font-medium hover:bg-white/[0.1]">View Post →</a>
               <button onclick="regenOutreach(this, '${lead.id}')" class="px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-[11px]">↻ Regen</button>
+              <button onclick="manualPushToSio('${lead.id}')" class="px-3 py-1.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-medium">→ Systeme.io</button>
             </div>
           </div>
         </div>
@@ -457,19 +618,43 @@ function regenOutreach(btn, id){
   container.querySelector('[data-text]').setAttribute('data-text', newText);
 }
 
-function toggleSave(id){
+async function toggleSave(id){
   const lead = allLeads.find(l=>l.id===id) || savedLeads.find(l=>l.id===id);
   if(!lead) return;
   const exists = savedLeads.findIndex(s=>s.id===id);
   if(exists>=0){
     savedLeads.splice(exists,1);
+    showToast('Removed from saved');
   } else {
     savedLeads.unshift({...lead, saved_at: new Date().toISOString()});
+    showToast('Saved lead ★ — ' + (sioConfig.auto==='on' && (sioConfig.apiKey||sioConfig.webhook) ? 'pushing to Systeme.io...' : 'saved locally'));
+
+    // Auto-push to Systeme.io if enabled
+    if(sioConfig.auto==='on' && (sioConfig.apiKey || sioConfig.webhook)){
+      const res = await pushToSystemeIo(lead);
+      if(res.success){
+        showToast('✅ Pushed to Systeme.io as contact with tag "'+sioConfig.tag+'"');
+      } else {
+        showToast('Saved locally, but Systeme.io push failed: '+(res.apiError||res.webhookError||'check config'));
+      }
+    }
   }
   localStorage.setItem('leadhunter_saved', JSON.stringify(savedLeads));
   updateSavedCount();
   renderLeads(allLeads);
   if(!document.getElementById('savedDrawer').classList.contains('hidden')) renderSaved();
+}
+
+async function manualPushToSio(id){
+  const lead = allLeads.find(l=>l.id===id) || savedLeads.find(l=>l.id===id);
+  if(!lead) return;
+  showToast('Pushing to Systeme.io...');
+  const res = await pushToSystemeIo(lead);
+  if(res.success){
+    showToast('✅ Sent to Systeme.io — check Contacts with tag "'+sioConfig.tag+'"');
+  } else {
+    showToast('❌ Systeme.io push failed: '+(res.apiError||res.webhookError||'configure API key or webhook in left panel'));
+  }
 }
 
 function updateSavedCount(){
@@ -580,11 +765,25 @@ document.getElementById('sortSelect').addEventListener('change', ()=>renderLeads
 document.getElementById('sourceFilter').addEventListener('change', ()=>renderLeads(allLeads));
 document.querySelectorAll('.intentFilter').forEach(c=>c.addEventListener('change', ()=>renderLeads(allLeads)));
 
+// Systeme.io Events
+document.getElementById('sioSaveBtn')?.addEventListener('click', saveSioConfig);
+document.getElementById('sioTestBtn')?.addEventListener('click', async ()=>{
+  saveSioConfig();
+  if(!sioConfig.apiKey && !sioConfig.webhook){ showToast('Add API key or webhook URL first'); return; }
+  showToast('Testing Systeme.io connection...');
+  const testLead = { id:'test', title:'Test lead from LeadHunter', snippet:'This is a test to verify Systeme.io integration', url:'https://fatahsystem7-glitch.github.io/lead-capture-agency/', author:'test_user', subreddit:'test', score:10, num_comments:1, created_utc: Date.now()/1000, intent:{score:85, level:'high'}, matched:['test'] };
+  const res = await pushToSystemeIo(testLead);
+  if(res.success){ showToast('✅ Systeme.io connected! Check Contacts with tag "'+sioConfig.tag+'"'); }
+  else { showToast('❌ Failed: '+(res.apiError||res.webhookError||'check key/webhook')); }
+});
+
 // Init
 updateSavedCount();
+updateSioStatus();
 window.copyOutreach = copyOutreach;
 window.regenOutreach = regenOutreach;
 window.toggleSave = toggleSave;
+window.manualPushToSio = manualPushToSio;
 window.loadDemo = loadDemo;
 
 // Reveal
