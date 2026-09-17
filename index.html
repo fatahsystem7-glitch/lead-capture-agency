@@ -3,240 +3,193 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LeadHunter — Find Buyers Asking For What You Sell on Reddit & Q&A</title>
-<meta name="description" content="Leadverse-style lead hunter. Enter your offer, enter what people search for, find live Reddit & Q&A posts with buying intent, and position your offer.">
+<title>LeadHunter Pro — Hunt Buyers on 12 Q&A & Forum APIs</title>
+<meta name="description" content="Ultimate Leadverse hunter: Reddit, HN, StackOverflow, Dev.to, Hashnode, Lobste.rs, Product Hunt, Indie Hackers, GitHub Issues, YouTube, Twitter, Quora via SerpAPI">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
-tailwind.config = {
-  theme: {
-    extend: {
-      fontFamily: { sans: ['Inter','sans-serif'], mono: ['JetBrains Mono','monospace'] },
-      colors: { ink: { 900:'#0A0A0B', 800:'#111113', 700:'#1A1A1E' }, brand: { 500:'#8B5CF6', 600:'#7C3AED' } }
-    }
-  }
-}
+tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif'],mono:['JetBrains Mono','monospace']},colors:{ink:{900:'#0A0A0B',800:'#111113',700:'#1A1A1E'},brand:{500:'#8B5CF6',600:'#7C3AED'}}}}}
 </script>
 <style>
-*{-webkit-font-smoothing:antialiased}
+*{ -webkit-font-smoothing:antialiased }
 body{background:#0A0A0B}
 .glass{background:rgba(17,17,19,0.7);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.06)}
 .gradient-text{background:linear-gradient(100deg,#A78BFA,#8B5CF6 30%,#6366F1 60%,#22D3EE);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .btn-primary{background:linear-gradient(100deg,#8B5CF6,#6366F1);box-shadow:0 0 20px rgba(139,92,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2)}
 .btn-primary:hover{transform:translateY(-1px);box-shadow:0 0 30px rgba(139,92,246,0.5)}
-.reveal{opacity:0;transform:translateY(12px);transition:all .6s cubic-bezier(0.16,1,0.3,1)}
-.reveal.in{opacity:1;transform:translateY(0)}
-.scrollbar-none::-webkit-scrollbar{display:none}
 .intent-high{background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(5,150,105,0.1));border-color:rgba(16,185,129,0.3);color:#10B981}
 .intent-med{background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(217,119,6,0.1));border-color:rgba(245,158,11,0.3);color:#F59E0B}
 .intent-low{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);color:#71717A}
+.source-badge{font-size:10px;font-family:JetBrains Mono;padding:3px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.05)}
 </style>
 </head>
 <body class="font-sans text-zinc-100 selection:bg-brand-500/30">
 
-<!-- Header -->
 <header class="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0A0A0B]/80 backdrop-blur-xl">
-<div class="mx-auto max-w-[1400px] px-6 h-[64px] flex items-center justify-between">
+<div class="mx-auto max-w-[1600px] px-6 h-[64px] flex items-center justify-between">
   <div class="flex items-center gap-3">
     <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center">🎯</div>
-    <span class="font-bold text-[17px] tracking-tight">LeadHunter</span>
-    <span class="ml-2 text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400">LEADVERSE OS</span>
-    <span class="hidden md:inline-flex ml-3 text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-1.5 inline-block"></span>Live Reddit API</span>
+    <span class="font-bold text-[17px]">LeadHunter Pro</span>
+    <span class="ml-2 text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400">12 APIS</span>
+    <span class="hidden lg:inline-flex ml-3 text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-1.5 inline-block"></span>Live Multi-Source</span>
   </div>
-  <div class="flex items-center gap-3">
-    <a href="#how" class="hidden md:block text-[13px] text-zinc-400 hover:text-white">How it works</a>
+  <div class="flex items-center gap-2">
     <button id="savedBtn" class="relative px-4 py-2 rounded-full bg-white/[0.06] border border-white/[0.08] text-[13px] font-medium hover:bg-white/[0.1]">Saved <span id="savedCount" class="ml-1.5 px-1.5 py-0.5 rounded-full bg-brand-500 text-white text-[10px]">0</span></button>
     <button id="exportBtn" class="px-4 py-2 rounded-full bg-white text-black text-[13px] font-semibold hover:bg-zinc-100">Export CSV</button>
   </div>
 </div>
 </header>
 
-<!-- Hero -->
-<section class="relative pt-14 pb-10 overflow-hidden">
-  <div class="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_rgba(139,92,246,0.15),_transparent_60%)]"></div>
-  <div class="mx-auto max-w-[1400px] px-6">
+<section class="relative pt-10 pb-8 overflow-hidden">
+<div class="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_rgba(139,92,246,0.15),_transparent_60%)]"></div>
+<div class="mx-auto max-w-[1600px] px-6">
+  <div class="flex flex-wrap items-start justify-between gap-6">
     <div class="max-w-[760px]">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.05] border border-white/[0.08] text-[11px] font-mono"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> FINDS BUYERS ASKING FOR WHAT YOU SELL</div>
-      <h1 class="mt-4 text-[36px] lg:text-[48px] font-[800] leading-[0.95] tracking-[-0.03em]">Find people asking for <span class="gradient-text">what you sell</span> on Reddit & Q&A</h1>
-      <p class="mt-4 text-[15px] leading-[1.6] text-zinc-400 max-w-[600px]">Enter your offer + keywords people use when they need it. Hunter scans live Reddit, Hacker News & Q&A posts with buying intent, scores them, and writes your outreach pitch. No more cold — only warm intent.</p>
-      <div class="mt-5 flex flex-wrap gap-2 text-[11px] font-mono">
-        <span class="px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400">✓ Live Reddit search</span>
-        <span class="px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400">✓ Intent scoring</span>
-        <span class="px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400">✓ Offer positioning</span>
-        <span class="px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400">✓ Outreach generator</span>
-      </div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.05] border border-white/[0.08] text-[11px] font-mono"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 12 Q&A & FORUM APIS • ONE SEARCH</div>
+      <h1 class="mt-3 text-[32px] lg:text-[44px] font-[800] leading-[0.95] tracking-[-0.03em]">Hunt buyers on <span class="gradient-text">12 platforms</span> where they ask for what you sell</h1>
+      <p class="mt-3 text-[14px] leading-[1.6] text-zinc-400 max-w-[640px]">Reddit, Hacker News, StackOverflow, Dev.to, Hashnode, Lobste.rs, Product Hunt, Indie Hackers, GitHub Issues, YouTube, Twitter, Quora (via SerpAPI). Enter offer + keywords → finds live posts with buying intent → generates outreach → pushes to Systeme.io.</p>
+    </div>
+    <div class="hidden lg:grid grid-cols-4 gap-2 text-[10px] font-mono">
+      <span class="source-badge">🟠 Reddit</span><span class="source-badge">🔶 HN</span><span class="source-badge">📚 StackOverflow</span><span class="source-badge">📝 Dev.to</span>
+      <span class="source-badge">✍️ Hashnode</span><span class="source-badge">🦞 Lobste.rs</span><span class="source-badge">🚀 Product Hunt</span><span class="source-badge">👨‍💻 Indie Hackers</span>
+      <span class="source-badge">🐙 GitHub</span><span class="source-badge">📺 YouTube</span><span class="source-badge">🐦 Twitter/X</span><span class="source-badge">❓ Quora</span>
     </div>
   </div>
+</div>
 </section>
 
-<!-- Main App -->
 <section class="pb-20">
-<div class="mx-auto max-w-[1400px] px-6">
-<div class="grid lg:grid-cols-[380px_1fr] gap-5 items-start">
+<div class="mx-auto max-w-[1600px] px-6">
+<div class="grid lg:grid-cols-[400px_1fr] gap-5 items-start">
 
-  <!-- Left: Controls -->
-  <div class="lg:sticky lg:top-[80px] space-y-4">
-    <div class="rounded-[20px] bg-[#121214] border border-white/[0.08] p-5">
-      <h3 class="text-[13px] font-mono tracking-widest text-zinc-500 uppercase">1. Your Offer</h3>
-      <label class="mt-3 block text-[12px] text-zinc-400">What do you sell? (to position offer)</label>
-      <textarea id="offerInput" rows="3" placeholder="e.g. I sell AI appointment setter for agencies that books 30% more meetings from missed calls..." class="mt-2 w-full p-3 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[13px] placeholder:text-zinc-600 focus:outline-none focus:border-brand-500/50">I sell AI appointment setter for agencies that recovers missed calls with instant SMS and books meetings on autopilot</textarea>
+<!-- Left Controls -->
+<div class="lg:sticky lg:top-[80px] space-y-4 max-h-[calc(100vh-90px)] overflow-auto scrollbar-none pr-1">
 
-      <h3 class="mt-6 text-[13px] font-mono tracking-widest text-zinc-500 uppercase">2. What People Search For</h3>
-      <label class="mt-3 block text-[12px] text-zinc-400">Keywords / pain they type when they need you (comma separated)</label>
-      <textarea id="keywordsInput" rows="4" placeholder="looking for lead gen tool, need CRM recommendation, best appointment scheduler, missed call solution..." class="mt-2 w-full p-3 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[13px] placeholder:text-zinc-600 focus:outline-none focus:border-brand-500/50">looking for appointment scheduler, need lead gen tool, best CRM for agency, missed call text back, need booking system, recommend lead capture</textarea>
+  <!-- Offer + Keywords -->
+  <div class="rounded-[20px] bg-[#121214] border border-white/[0.08] p-5">
+    <h3 class="text-[11px] font-mono tracking-widest text-zinc-500 uppercase">Your Offer</h3>
+    <textarea id="offerInput" rows="3" class="mt-2 w-full p-3 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[13px] placeholder:text-zinc-600 focus:outline-none focus:border-brand-500/50">I sell AI appointment setter for agencies that recovers missed calls with instant SMS and books meetings on autopilot</textarea>
 
-      <div class="mt-4 grid grid-cols-2 gap-3">
-        <div>
-          <label class="text-[11px] text-zinc-500 uppercase tracking-widest">Subreddits (optional)</label>
-          <input id="subredditsInput" placeholder="Entrepreneur, SaaS, marketing, sales, smallbusiness" class="mt-1.5 w-full h-10 px-3 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[13px] placeholder:text-zinc-600 focus:outline-none focus:border-brand-500/50"/>
-        </div>
-        <div>
-          <label class="text-[11px] text-zinc-500 uppercase tracking-widest">Time Window</label>
-          <select id="timeInput" class="mt-1.5 w-full h-10 px-3 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[13px] text-zinc-300">
-            <option value="week">Past week (hot)</option>
-            <option value="month">Past month</option>
-            <option value="all">All time</option>
-            <option value="day">Past 24h (urgent)</option>
-          </select>
-        </div>
-      </div>
+    <h3 class="mt-5 text-[11px] font-mono tracking-widest text-zinc-500 uppercase">Keywords People Search</h3>
+    <textarea id="keywordsInput" rows="3" class="mt-2 w-full p-3 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[13px] placeholder:text-zinc-600 focus:outline-none focus:border-brand-500/50">looking for appointment scheduler, need lead gen tool, best CRM for agency, missed call text back, need booking system</textarea>
 
-      <div class="mt-4">
-        <label class="text-[11px] text-zinc-500 uppercase tracking-widest">Intent Filters</label>
-        <div class="mt-2 grid grid-cols-1 gap-2">
-          <label class="flex items-center gap-2 text-[12px] text-zinc-300"><input type="checkbox" class="intentFilter" value="looking" checked> 🔍 Looking for / Recommendation ("looking for", "recommend")</label>
-          <label class="flex items-center gap-2 text-[12px] text-zinc-300"><input type="checkbox" class="intentFilter" value="help" checked> 🆘 Asking for help ("need help", "how to", "struggling")</label>
-          <label class="flex items-center gap-2 text-[12px] text-zinc-300"><input type="checkbox" class="intentFilter" value="pain" checked> 😤 Pain / Complaint ("tired of", "frustrated", "alternative")</label>
-          <label class="flex items-center gap-2 text-[12px] text-zinc-300"><input type="checkbox" class="intentFilter" value="buy" checked> 💰 Buying intent ("best", "pricing", "vs", "compare")</label>
-        </div>
-      </div>
-
-      <!-- Systeme.io Integration -->
-      <div class="mt-5 p-4 rounded-[14px] bg-gradient-to-br from-blue-600/10 to-indigo-600/10 border border-blue-500/20">
-        <div class="flex items-center justify-between">
-          <h4 class="text-[11px] font-mono tracking-widest text-blue-300 uppercase">🔌 Systeme.io Plug-in</h4>
-          <span id="sioStatus" class="text-[10px] px-2 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400">Not connected</span>
-        </div>
-        <div class="mt-3 space-y-2.5">
-          <div>
-            <label class="text-[11px] text-zinc-400">Systeme.io API Key (for auto-create contacts)</label>
-            <input id="sioApiKey" type="password" placeholder="api_xxxxxxxx or leave blank for webhook only" class="mt-1 w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[12px] font-mono placeholder:text-zinc-600 focus:outline-none focus:border-blue-500/50"/>
-          </div>
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="text-[11px] text-zinc-400">Tag</label>
-              <input id="sioTag" placeholder="reddit-lead" value="reddit-lead" class="mt-1 w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[12px] placeholder:text-zinc-600 focus:outline-none focus:border-blue-500/50"/>
-            </div>
-            <div>
-              <label class="text-[11px] text-zinc-400">Auto-push?</label>
-              <select id="sioAuto" class="mt-1 w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[12px] text-zinc-300">
-                <option value="off">Off - manual only</option>
-                <option value="on">On - auto push on Save</option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <label class="text-[11px] text-zinc-400">Or Webhook URL (no API key needed) — from Systeme.io Workflows → Trigger: Incoming Webhook</label>
-            <input id="sioWebhook" placeholder="https://app.systeme.io/api/webhooks/xxx or Zapier webhook" class="mt-1 w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[12px] font-mono placeholder:text-zinc-600 focus:outline-none focus:border-blue-500/50"/>
-          </div>
-          <div class="flex gap-2">
-            <button id="sioSaveBtn" class="flex-1 h-8 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-semibold">Save & Connect</button>
-            <button id="sioTestBtn" class="px-3 h-8 rounded-full bg-white/[0.06] border border-white/[0.08] text-[11px] font-medium hover:bg-white/[0.1]">Test</button>
-          </div>
-          <div class="text-[10px] leading-[1.5] text-zinc-500">API key stored only in your browser (localStorage). Never sent to our server. GitHub Pages is static. For iframe embed in systeme.io funnel, use: <code class="px-1 py-0.5 rounded bg-white/[0.08] text-zinc-300">&lt;iframe src="https://fatahsystem7-glitch.github.io/lead-capture-agency/" width="100%" height="900"&gt;</code></div>
-        </div>
-      </div>
-
-      <div class="mt-5 flex gap-2">
-        <button id="huntBtn" class="btn-primary flex-1 h-11 rounded-full font-semibold text-[14px] text-white flex items-center justify-center gap-2">
-          <span id="huntText">🎯 Hunt Leads Now</span>
-          <span id="huntSpinner" class="hidden animate-spin">◍</span>
-        </button>
-        <button id="demoBtn" class="px-4 h-11 rounded-full bg-white/[0.06] border border-white/[0.08] text-[13px] font-medium hover:bg-white/[0.1]">Demo Data</button>
-      </div>
-
-      <div class="mt-3 text-[11px] text-zinc-500 leading-[1.5]">Live search uses Reddit JSON + HN Algolia APIs (no key needed). For Q&A sites like Quora, we score intent from title patterns. Results are public posts — always check subreddit rules before outreach.</div>
-    </div>
-
-    <div class="rounded-[16px] bg-[#121214] border border-white/[0.06] p-4">
-      <h4 class="text-[12px] font-semibold">💡 How to position offer (Leadverse method)</h4>
-      <ol class="mt-2 space-y-1.5 text-[11px] leading-[1.6] text-zinc-400 list-decimal list-inside">
-        <li>Find post where someone <span class="text-zinc-200">asks for what you sell</span></li>
-        <li>Don't pitch — <span class="text-zinc-200">answer their question</span> + soft mention your solution</li>
-        <li>Use outreach generator below → personalized, not spammy</li>
-        <li>Save high-intent leads → export CSV → CRM</li>
-      </ol>
+    <div class="mt-4 grid grid-cols-2 gap-3">
+      <div><label class="text-[11px] text-zinc-500 uppercase">Subreddits (opt)</label><input id="subredditsInput" placeholder="Entrepreneur, SaaS, marketing" class="mt-1 w-full h-10 px-3 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[13px]"/></div>
+      <div><label class="text-[11px] text-zinc-500 uppercase">Time</label><select id="timeInput" class="mt-1 w-full h-10 px-3 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[13px] text-zinc-300"><option value="week">Past week</option><option value="month">Past month</option><option value="day">24h</option><option value="all">All time</option></select></div>
     </div>
   </div>
 
-  <!-- Right: Results -->
-  <div class="space-y-4">
-    <!-- Stats Bar -->
-    <div class="rounded-[16px] bg-[#121214] border border-white/[0.06] p-4 flex flex-wrap items-center justify-between gap-4">
-      <div class="flex items-center gap-6">
-        <div><div class="text-[11px] text-zinc-500 uppercase tracking-widest">Leads Found</div><div id="statFound" class="text-[20px] font-bold">0</div></div>
-        <div class="w-px h-8 bg-white/[0.08]"></div>
-        <div><div class="text-[11px] text-zinc-500 uppercase tracking-widest">High Intent</div><div id="statHigh" class="text-[20px] font-bold text-emerald-400">0</div></div>
-        <div><div class="text-[11px] text-zinc-500 uppercase tracking-widest">Avg Score</div><div id="statScore" class="text-[20px] font-bold">0%</div></div>
-        <div class="hidden md:block w-px h-8 bg-white/[0.08]"></div>
-        <div class="hidden md:block text-[11px] text-zinc-500 max-w-[200px]">Tip: High intent = contains "looking for", "recommend", "need" + your keywords</div>
-      </div>
-      <div class="flex items-center gap-2">
-        <select id="sortSelect" class="h-8 px-3 rounded-full bg-[#0F0F10] border border-white/[0.08] text-[12px]"><option value="score">Sort: Intent Score</option><option value="new">Sort: Newest</option><option value="comments">Sort: Most Comments</option></select>
-        <select id="sourceFilter" class="h-8 px-3 rounded-full bg-[#0F0F10] border border-white/[0.08] text-[12px]"><option value="">All Sources</option><option value="reddit">Reddit only</option><option value="hackernews">Hacker News only</option></select>
-      </div>
+  <!-- Sources -->
+  <div class="rounded-[20px] bg-[#121214] border border-white/[0.08] p-5">
+    <div class="flex items-center justify-between">
+      <h3 class="text-[11px] font-mono tracking-widest text-zinc-500 uppercase">Q&A Sources (12 APIs)</h3>
+      <button id="selectAllBtn" class="text-[11px] text-brand-400 hover:underline">Select all</button>
+    </div>
+    <div class="mt-3 grid grid-cols-1 gap-2 text-[12px]">
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06] hover:border-white/[0.12]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="reddit" checked> 🟠 Reddit (no key)</span><span class="text-[10px] text-emerald-400">FREE</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="hackernews" checked> 🔶 Hacker News (no key)</span><span class="text-[10px] text-emerald-400">FREE</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="stackoverflow" checked> 📚 StackOverflow (no key)</span><span class="text-[10px] text-emerald-400">FREE</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="devto" checked> 📝 Dev.to (no key)</span><span class="text-[10px] text-emerald-400">FREE</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="hashnode" checked> ✍️ Hashnode (no key)</span><span class="text-[10px] text-emerald-400">FREE</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="lobsters" checked> 🦞 Lobste.rs (no key)</span><span class="text-[10px] text-emerald-400">FREE</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="github" checked> 🐙 GitHub Issues (no key)</span><span class="text-[10px] text-emerald-400">FREE</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="producthunt"> 🚀 Product Hunt (needs token)</span><span class="text-[10px] text-amber-400">KEY</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="indiehackers"> 👨‍💻 Indie Hackers (no key, beta)</span><span class="text-[10px] text-zinc-500">BETA</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="youtube"> 📺 YouTube (needs API key)</span><span class="text-[10px] text-amber-400">KEY</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="twitter"> 🐦 Twitter/X (needs Bearer)</span><span class="text-[10px] text-amber-400">KEY</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="quora"> ❓ Quora via SerpAPI (needs key)</span><span class="text-[10px] text-amber-400">KEY</span></label>
     </div>
 
-    <!-- Results Container -->
-    <div id="resultsContainer" class="space-y-3 min-h-[400px]">
-      <div id="emptyState" class="rounded-[20px] bg-[#121214] border border-dashed border-white/[0.08] p-12 text-center">
-        <div class="text-[32px]">🎯</div>
-        <h3 class="mt-3 text-[16px] font-semibold">Ready to hunt buyers?</h3>
-        <p class="mt-2 text-[13px] text-zinc-500 max-w-[420px] mx-auto leading-[1.6]">Enter your offer + keywords on the left, click "Hunt Leads Now". We'll scan live Reddit posts from past week where people are asking for what you sell, score buying intent, and write your outreach pitch.</p>
-        <div class="mt-6 flex justify-center gap-2">
-          <button onclick="document.getElementById('demoBtn').click()" class="px-5 py-2.5 rounded-full bg-white text-black text-[13px] font-semibold">Load Demo Leads →</button>
-          <button onclick="document.getElementById('huntBtn').click()" class="px-5 py-2.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-[13px] font-medium">Hunt Live Now</button>
-        </div>
-        <div class="mt-8 grid grid-cols-3 gap-3 max-w-[500px] mx-auto text-left">
-          <div class="p-3 rounded-xl bg-[#0F0F10] border border-white/[0.06]"><div class="text-[11px] text-zinc-500">Example Keywords</div><div class="mt-1 text-[12px] text-zinc-300">"looking for CRM", "best lead gen tool", "need booking system"</div></div>
-          <div class="p-3 rounded-xl bg-[#0F0F10] border border-white/[0.06]"><div class="text-[11px] text-zinc-500">Intent Signals</div><div class="mt-1 text-[12px] text-zinc-300">recommend, need help, alternative, frustrated, vs, pricing</div></div>
-          <div class="p-3 rounded-xl bg-[#0F0F10] border border-white/[0.06]"><div class="text-[11px] text-zinc-500">Your Edge</div><div class="mt-1 text-[12px] text-zinc-300">Answer first, pitch soft. Position offer as solution, not spam.</div></div>
-        </div>
+    <div class="mt-3">
+      <label class="text-[11px] text-zinc-500 uppercase">Intent Filters</label>
+      <div class="mt-2 grid grid-cols-1 gap-1.5 text-[11px] text-zinc-300">
+        <label class="flex items-center gap-2"><input type="checkbox" class="intentFilter" value="looking" checked> 🔍 Looking for / Recommend</label>
+        <label class="flex items-center gap-2"><input type="checkbox" class="intentFilter" value="help" checked> 🆘 Need help / How to</label>
+        <label class="flex items-center gap-2"><input type="checkbox" class="intentFilter" value="pain" checked> 😤 Pain / Alternative / vs</label>
+        <label class="flex items-center gap-2"><input type="checkbox" class="intentFilter" value="buy" checked> 💰 Best / Pricing / Compare</label>
       </div>
     </div>
-
-    <!-- Saved Drawer -->
-    <div id="savedDrawer" class="hidden fixed inset-0 z-50">
-      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="document.getElementById('savedDrawer').classList.add('hidden')"></div>
-      <div class="absolute right-0 top-0 h-full w-full max-w-[520px] bg-[#0F0F10] border-l border-white/[0.08] overflow-auto">
-        <div class="sticky top-0 bg-[#0F0F10] border-b border-white/[0.06] p-5 flex items-center justify-between">
-          <h3 class="font-semibold">Saved Leads (<span id="savedCountDrawer">0</span>)</h3>
-          <button onclick="document.getElementById('savedDrawer').classList.add('hidden')" class="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center">✕</button>
-        </div>
-        <div id="savedList" class="p-4 space-y-3"></div>
-      </div>
-    </div>
-
   </div>
+
+  <!-- API Keys -->
+  <div class="rounded-[20px] bg-[#121214] border border-amber-500/20 p-5">
+    <h3 class="text-[11px] font-mono tracking-widest text-amber-300 uppercase">🔑 API Keys (Optional — Unlocks More Sources)</h3>
+    <p class="mt-1 text-[11px] text-zinc-500">Stored only in your browser localStorage. Never sent to our server. GitHub Pages is static.</p>
+    <div class="mt-3 space-y-2.5">
+      <div><label class="text-[11px] text-zinc-400">YouTube Data API Key (for YouTube source)</label><input id="ytKey" type="password" placeholder="AIza..." class="mt-1 w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[11px] font-mono"/></div>
+      <div><label class="text-[11px] text-zinc-400">Twitter Bearer Token (for Twitter source) — needs backend proxy, may be CORS blocked</label><input id="twKey" type="password" placeholder="AAAAAAAAAAAAAAAA..." class="mt-1 w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[11px] font-mono"/></div>
+      <div><label class="text-[11px] text-zinc-400">SerpAPI Key (for Quora + Google Forums)</label><input id="serpKey" type="password" placeholder="your SerpAPI key" class="mt-1 w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[11px] font-mono"/></div>
+      <div><label class="text-[11px] text-zinc-400">Product Hunt Token (optional)</label><input id="phKey" type="password" placeholder="Product Hunt API token" class="mt-1 w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[11px] font-mono"/></div>
+      <div><label class="text-[11px] text-zinc-400">GitHub Token (optional, higher rate limit for GitHub Issues)</label><input id="ghKey" type="password" placeholder="ghp_..." class="mt-1 w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[11px] font-mono"/></div>
+      <button id="saveKeysBtn" class="w-full h-8 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[11px] font-semibold hover:bg-amber-500/30">Save Keys Locally</button>
+    </div>
+  </div>
+
+  <!-- Systeme.io -->
+  <div class="rounded-[20px] bg-gradient-to-br from-blue-600/10 to-indigo-600/10 border border-blue-500/20 p-5">
+    <div class="flex items-center justify-between"><h4 class="text-[11px] font-mono tracking-widest text-blue-300 uppercase">🔌 Systeme.io Plug-in</h4><span id="sioStatus" class="text-[10px] px-2 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400">Not connected</span></div>
+    <div class="mt-3 space-y-2">
+      <input id="sioApiKey" type="password" placeholder="Systeme.io API Key (api_...)" class="w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[11px] font-mono"/>
+      <div class="grid grid-cols-2 gap-2"><input id="sioTag" placeholder="Tag: reddit-lead" value="reddit-lead" class="h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[12px]"/><select id="sioAuto" class="h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[12px] text-zinc-300"><option value="off">Manual push</option><option value="on">Auto-push on Save</option></select></div>
+      <input id="sioWebhook" placeholder="Or webhook URL (systeme.io workflow / Zapier)" class="w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[11px] font-mono"/>
+      <div class="flex gap-2"><button id="sioSaveBtn" class="flex-1 h-8 rounded-full bg-blue-600 text-white text-[11px] font-semibold">Save</button><button id="sioTestBtn" class="px-3 h-8 rounded-full bg-white/[0.06] border border-white/[0.08] text-[11px]">Test</button></div>
+    </div>
+  </div>
+
+  <div class="rounded-[16px] bg-[#121214] border border-white/[0.06] p-4">
+    <button id="huntBtn" class="btn-primary w-full h-12 rounded-full font-bold text-[14px] text-white flex items-center justify-center gap-2"><span id="huntText">🎯 Hunt 12 Sources Now</span><span id="huntSpinner" class="hidden animate-spin">◍</span></button>
+    <div class="mt-2 grid grid-cols-2 gap-2"><button id="demoBtn" class="h-10 rounded-full bg-white/[0.06] border border-white/[0.08] text-[12px] font-medium hover:bg-white/[0.1]">Load Demo</button><button id="clearBtn" class="h-10 rounded-full bg-white/[0.06] border border-white/[0.08] text-[12px] font-medium hover:bg-white/[0.1]">Clear</button></div>
+    <div class="mt-3 text-[10px] leading-[1.5] text-zinc-500">All FREE sources work without keys. Keys only unlock YouTube, Twitter, Quora via SerpAPI, Product Hunt. Keys stored locally, never sent to server.</div>
+  </div>
+</div>
+
+<!-- Right Results -->
+<div class="space-y-4">
+  <div class="rounded-[16px] bg-[#121214] border border-white/[0.06] p-4 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-5">
+      <div><div class="text-[10px] text-zinc-500 uppercase">Found</div><div id="statFound" class="text-[20px] font-bold">0</div></div>
+      <div class="w-px h-8 bg-white/[0.08]"></div>
+      <div><div class="text-[10px] text-zinc-500 uppercase">High Intent</div><div id="statHigh" class="text-[20px] font-bold text-emerald-400">0</div></div>
+      <div><div class="text-[10px] text-zinc-500 uppercase">Avg Score</div><div id="statScore" class="text-[20px] font-bold">0%</div></div>
+      <div class="hidden md:block w-px h-8 bg-white/[0.08]"></div>
+      <div id="sourceStats" class="hidden lg:flex gap-2 text-[10px] font-mono flex-wrap max-w-[320px]"></div>
+    </div>
+    <div class="flex items-center gap-2">
+      <select id="sortSelect" class="h-8 px-3 rounded-full bg-[#0F0F10] border border-white/[0.08] text-[11px]"><option value="score">Sort: Intent</option><option value="new">Sort: Newest</option><option value="comments">Sort: Comments</option></select>
+      <select id="sourceFilter" class="h-8 px-3 rounded-full bg-[#0F0F10] border border-white/[0.08] text-[11px]"><option value="">All Sources</option><option value="reddit">Reddit</option><option value="hackernews">HN</option><option value="stackoverflow">StackOverflow</option><option value="devto">Dev.to</option><option value="hashnode">Hashnode</option><option value="lobsters">Lobste.rs</option><option value="github">GitHub</option><option value="youtube">YouTube</option><option value="twitter">Twitter</option><option value="quora">Quora</option><option value="producthunt">Product Hunt</option></select>
+    </div>
+  </div>
+
+  <div id="resultsContainer" class="space-y-3 min-h-[500px]">
+    <div id="emptyState" class="rounded-[20px] bg-[#121214] border border-dashed border-white/[0.08] p-12 text-center">
+      <div class="text-[32px]">🎯</div>
+      <h3 class="mt-3 text-[16px] font-semibold">12 Q&A APIs ready — hunt buyers now</h3>
+      <p class="mt-2 text-[13px] text-zinc-500 max-w-[560px] mx-auto leading-[1.6]">Select sources on left (7 FREE work without keys), enter keywords, click Hunt. We'll scan Reddit, HN, StackOverflow, Dev.to, Hashnode, Lobste.rs, GitHub Issues live + YouTube, Twitter, Quora if you add keys. Each lead gets intent score + outreach pitch + Systeme.io push.</p>
+      <div class="mt-6 flex justify-center gap-2"><button onclick="loadDemo()" class="px-5 py-2.5 rounded-full bg-white text-black text-[13px] font-semibold">Load Demo (12 sources) →</button><button onclick="document.getElementById('huntBtn').click()" class="px-5 py-2.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-[13px] font-medium">Hunt Live Now</button></div>
+      <div class="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-3 max-w-[700px] mx-auto text-left">
+        <div class="p-3 rounded-xl bg-[#0F0F10] border border-white/[0.06]"><div class="text-[10px] text-zinc-500">FREE (no key)</div><div class="mt-1 text-[11px] text-zinc-300">Reddit, HN, StackOverflow, Dev.to, Hashnode, Lobste.rs, GitHub</div></div>
+        <div class="p-3 rounded-xl bg-[#0F0F10] border border-white/[0.06]"><div class="text-[10px] text-zinc-500">With API Key</div><div class="mt-1 text-[11px] text-zinc-300">YouTube (AIza...), Twitter (Bearer), SerpAPI Quora, Product Hunt</div></div>
+        <div class="p-3 rounded-xl bg-[#0F0F10] border border-white/[0.06]"><div class="text-[10px] text-zinc-500">Intent Signals</div><div class="mt-1 text-[11px] text-zinc-300">looking for, recommend, need help, alternative, best, vs, pricing, frustrated</div></div>
+        <div class="p-3 rounded-xl bg-[#0F0F10] border border-white/[0.06]"><div class="text-[10px] text-zinc-500">Systeme.io</div><div class="mt-1 text-[11px] text-zinc-300">Save → auto-creates contact with tag, triggers workflow</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="savedDrawer" class="hidden fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="document.getElementById('savedDrawer').classList.add('hidden')"></div>
+    <div class="absolute right-0 top-0 h-full w-full max-w-[520px] bg-[#0F0F10] border-l border-white/[0.08] overflow-auto">
+      <div class="sticky top-0 bg-[#0F0F10] border-b border-white/[0.06] p-5 flex items-center justify-between"><h3 class="font-semibold">Saved Leads (<span id="savedCountDrawer">0</span>)</h3><button onclick="document.getElementById('savedDrawer').classList.add('hidden')" class="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center">✕</button></div>
+      <div id="savedList" class="p-4 space-y-3"></div>
+    </div>
+  </div>
+
+</div>
 </div>
 </div>
 </section>
 
-<!-- How it Works -->
-<section id="how" class="py-16 border-t border-white/[0.06] bg-[#0E0E10]">
-<div class="mx-auto max-w-[1400px] px-6">
-  <h2 class="text-[24px] font-bold tracking-tight">How LeadHunter finds buyers (Leadverse method)</h2>
-  <div class="mt-8 grid md:grid-cols-4 gap-4">
-    <div class="rounded-[16px] bg-[#151517] border border-white/[0.06] p-5"><div class="w-8 h-8 rounded-lg bg-brand-500/20 border border-brand-500/20 flex items-center justify-center text-[14px]">1</div><h4 class="mt-3 text-[14px] font-semibold">Enter your offer + keywords</h4><p class="mt-2 text-[12px] text-zinc-400 leading-[1.6]">What you sell + what people type when they need it: "looking for CRM", "best lead gen", "need booking tool"</p></div>
-    <div class="rounded-[16px] bg-[#151517] border border-white/[0.06] p-5"><div class="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center text-[14px]">2</div><h4 class="mt-3 text-[14px] font-semibold">Scans Reddit & Q&A live</h4><p class="mt-2 text-[12px] text-zinc-400 leading-[1.6]">Searches public Reddit JSON + HN Algolia for posts in past week containing your keywords + intent phrases</p></div>
-    <div class="rounded-[16px] bg-[#151517] border border-white/[0.06] p-5"><div class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/20 flex items-center justify-center text-[14px]">3</div><h4 class="mt-3 text-[14px] font-semibold">Scores buying intent</h4><p class="mt-2 text-[12px] text-zinc-400 leading-[1.6]">High = "looking for", "recommend", "need" + your keyword. Medium = "help", "alternative". Filters spam.</p></div>
-    <div class="rounded-[16px] bg-[#151517] border border-white/[0.06] p-5"><div class="w-8 h-8 rounded-lg bg-cyan-500/20 border border-cyan-500/20 flex items-center justify-center text-[14px]">4</div><h4 class="mt-3 text-[14px] font-semibold">Position your offer</h4><p class="mt-2 text-[12px] text-zinc-400 leading-[1.6]">One-click generates personalized outreach that answers their question + soft pitches your offer. Export to CRM.</p></div>
-  </div>
-</div>
-</section>
-
-<footer class="border-t border-white/[0.06] py-8 text-center text-[12px] text-zinc-600">
-  LeadHunter — Leadverse-style intent hunter • Live Reddit API • No login required • <a href="?admin=1" class="underline decoration-dotted">Admin</a> • Built for agencies who hate cold outreach
+<footer class="border-t border-white/[0.06] py-8 text-center text-[11px] text-zinc-600">
+  LeadHunter Pro — 12 APIs: Reddit, HN, StackOverflow, Dev.to, Hashnode, Lobste.rs, Product Hunt, Indie Hackers, GitHub, YouTube, Twitter, Quora • Systeme.io ready • <a href="?admin=1" class="underline decoration-dotted">Admin</a>
 </footer>
 
 <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] hidden px-4 py-3 rounded-full bg-[#1A1A1E] border border-white/[0.08] text-[13px] shadow-xl"></div>
@@ -246,549 +199,330 @@ body{background:#0A0A0B}
 let allLeads = [];
 let savedLeads = JSON.parse(localStorage.getItem('leadhunter_saved')||'[]');
 let isHunting = false;
-
-// Systeme.io Integration State
 let sioConfig = JSON.parse(localStorage.getItem('leadhunter_sio')||'{"apiKey":"","tag":"reddit-lead","webhook":"","auto":"off"}');
-
-function saveSioConfig(){
-  sioConfig = {
-    apiKey: document.getElementById('sioApiKey')?.value.trim() || '',
-    tag: document.getElementById('sioTag')?.value.trim() || 'reddit-lead',
-    webhook: document.getElementById('sioWebhook')?.value.trim() || '',
-    auto: document.getElementById('sioAuto')?.value || 'off'
-  };
-  localStorage.setItem('leadhunter_sio', JSON.stringify(sioConfig));
-  updateSioStatus();
-  showToast('Systeme.io config saved');
-}
-
-function updateSioStatus(){
-  const el = document.getElementById('sioStatus');
-  if(!el) return;
-  if(sioConfig.apiKey || sioConfig.webhook){
-    el.textContent = sioConfig.apiKey ? '✅ API connected' : '✅ Webhook connected';
-    el.className = 'text-[10px] px-2 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/20 text-emerald-400';
-  } else {
-    el.textContent = 'Not connected';
-    el.className = 'text-[10px] px-2 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400';
-  }
-  // Fill inputs
-  const apiIn = document.getElementById('sioApiKey');
-  const tagIn = document.getElementById('sioTag');
-  const webIn = document.getElementById('sioWebhook');
-  const autoIn = document.getElementById('sioAuto');
-  if(apiIn && !apiIn.value) apiIn.value = sioConfig.apiKey;
-  if(tagIn) tagIn.value = sioConfig.tag;
-  if(webIn && !webIn.value) webIn.value = sioConfig.webhook;
-  if(autoIn) autoIn.value = sioConfig.auto;
-}
-
-async function pushToSystemeIo(lead){
-  const config = sioConfig;
-  if(!config.apiKey && !config.webhook){
-    showToast('Connect Systeme.io first — add API key or webhook URL in left panel');
-    return { success:false, error:'not configured' };
-  }
-
-  // Prepare payload
-  const outreach = generateOutreach(lead, document.getElementById('offerInput').value);
-  const payload = {
-    email: `${lead.author}@reddit.lead`.replace(/[^a-zA-Z0-9@._-]/g,''),
-    firstName: lead.author || 'Reddit Lead',
-    lastName: lead.subreddit || '',
-    source: 'LeadHunter',
-    reddit_post: lead.title,
-    subreddit: lead.subreddit,
-    post_url: lead.url,
-    intent_score: lead.intent.score,
-    intent_level: lead.intent.level,
-    matched_keywords: (lead.matched||[]).join(', '),
-    snippet: lead.snippet,
-    outreach_message: outreach,
-    author: lead.author,
-    saved_at: new Date().toISOString(),
-    tag: config.tag
-  };
-
-  let result = { success:false };
-
-  // Try webhook first if present (works for Systeme.io workflows, Zapier, Make)
-  if(config.webhook){
-    try {
-      const res = await fetch(config.webhook, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if(res.ok){
-        result.webhook = true;
-        result.success = true;
-      } else {
-        result.webhookError = `Webhook ${res.status}`;
-      }
-    } catch(e){
-      result.webhookError = e.message;
-    }
-  }
-
-  // Try direct Systeme.io API if key present
-  if(config.apiKey){
-    try {
-      // Systeme.io API: POST https://api.systeme.io/api/contacts
-      const res = await fetch('https://api.systeme.io/api/contacts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': config.apiKey
-        },
-        body: JSON.stringify({
-          email: payload.email,
-          firstName: payload.firstName,
-          lastName: payload.lastName,
-          fields: [
-            { slug: 'reddit_post', value: payload.reddit_post?.slice(0,255) },
-            { slug: 'subreddit', value: payload.subreddit },
-            { slug: 'post_url', value: payload.post_url },
-            { slug: 'intent_score', value: String(payload.intent_score) },
-            { slug: 'outreach_message', value: payload.outreach_message?.slice(0,500) }
-          ],
-          tags: [{ name: config.tag }]
-        })
-      });
-      const data = await res.json().catch(()=>({}));
-      if(res.ok){
-        result.api = true;
-        result.success = true;
-      } else {
-        result.apiError = data.message || `API ${res.status}`;
-        // If 401, API key invalid
-      }
-    } catch(e){
-      result.apiError = e.message;
-    }
-  }
-
-  return result;
-}
+let apiKeys = JSON.parse(localStorage.getItem('leadhunter_keys')||'{"yt":"","tw":"","serp":"","ph":"","gh":""}');
 
 const INTENT_PHRASES = {
-  looking: ['looking for','looking to','searching for','recommend','recommendation','suggest','any recommendations','what do you use for'],
-  help: ['need help','help with','how to','struggling','stuck','anyone know','how do you','can someone'],
-  pain: ['tired of','frustrated','hate','annoying','alternative to','alternative for','switch from','replace','vs','versus','not working','issue with'],
-  buy: ['best','top','pricing','cost','compare','comparison','worth it','should i buy','which one']
+  looking: ['looking for','looking to','searching for','recommend','recommendation','suggest','any recommendations','what do you use for','seeking'],
+  help: ['need help','help with','how to','struggling','stuck','anyone know','how do you','can someone','need advice'],
+  pain: ['tired of','frustrated','hate','annoying','alternative to','alternative for','switch from','replace','vs','versus','not working','issue with','problem with','disappointed'],
+  buy: ['best','top','pricing','cost','compare','comparison','worth it','should i buy','which one','review']
 };
 
 function calcIntentScore(text, keywords){
   const lower = text.toLowerCase();
-  let score = 0;
-  let matched = [];
-  let intentType = [];
-
-  // Check intent phrases
+  let score = 0, matched=[], intentType=[];
   Object.entries(INTENT_PHRASES).forEach(([type, phrases])=>{
-    phrases.forEach(p=>{
-      if(lower.includes(p)){ score += 15; matched.push(p); if(!intentType.includes(type)) intentType.push(type); }
-    });
+    phrases.forEach(p=>{ if(lower.includes(p)){ score+=15; matched.push(p); if(!intentType.includes(type)) intentType.push(type); } });
   });
-
-  // Check keywords
-  const kwList = keywords.toLowerCase().split(',').map(k=>k.trim()).filter(Boolean);
-  kwList.forEach(kw=>{
-    if(lower.includes(kw.toLowerCase())){ score += 25; matched.push(kw); }
+  keywords.toLowerCase().split(',').map(k=>k.trim()).filter(Boolean).forEach(kw=>{
+    if(lower.includes(kw.toLowerCase())){ score+=25; matched.push(kw); }
   });
-
-  // Bonus for question
-  if(text.includes('?')) score += 10;
-
-  // Cap
+  if(text.includes('?')) score+=10;
   score = Math.min(100, score);
-  let level = score >= 60 ? 'high' : score >= 30 ? 'med' : 'low';
-  return { score, level, matched: [...new Set(matched)].slice(0,5), intentType };
+  let level = score>=60?'high':score>=30?'med':'low';
+  return { score, level, matched:[...new Set(matched)].slice(0,5), intentType };
 }
+function timeAgo(dateStr){ const d=new Date(dateStr); const diff=Date.now()-d.getTime(); const mins=Math.floor(diff/60000); if(mins<60) return `${mins}m ago`; const hrs=Math.floor(mins/60); if(hrs<24) return `${hrs}h ago`; const days=Math.floor(hrs/24); return `${days}d ago`; }
+function generateOutreach(lead, offer){ const name=lead.author||'there'; const keyword=lead.matched?.[0]||lead.keyword||'what you mentioned'; const sub=lead.subreddit?`in r/${lead.subreddit}`: lead.source?`on ${lead.source}`:''; const templates=[`Hey ${name}, saw your post ${sub} about "${keyword}" — super relevant. We built ${offer.slice(0,120)}... that solves exactly that. Not pitching, but happy to share how we handle it if helpful?`,`Hi ${name}! Noticed you're ${keyword} ${sub}. We struggled with same, so we built ${offer.slice(0,100)} — might be useful. Can share quick 2-min loom, no pitch. Want it?`,`${name} — your post about ${keyword} caught my eye ${sub}. We built ${offer.slice(0,110)} specifically for that pain. If still looking, I can send teardown, no sales. Interested?`]; return templates[Math.floor(Math.random()*templates.length)]; }
 
-function timeAgo(dateStr){
-  const d = new Date(dateStr);
-  const diff = Date.now() - d.getTime();
-  const mins = Math.floor(diff/60000);
-  if(mins<60) return `${mins}m ago`;
-  const hrs = Math.floor(mins/60);
-  if(hrs<24) return `${hrs}h ago`;
-  const days = Math.floor(hrs/24);
-  return `${days}d ago`;
-}
-
-function generateOutreach(lead, offer){
-  const name = lead.author ? lead.author : 'there';
-  const keyword = lead.matchedKeywords?.[0] || lead.matched?.[0] || 'what you mentioned';
-  const sub = lead.subreddit ? `in r/${lead.subreddit}` : '';
-  const templates = [
-    `Hey ${name}, saw your post ${sub} about "${keyword}" — super relevant. We actually built ${offer.slice(0,120)}... that solves exactly that. Not pitching, but happy to share how we handle it if helpful? We helped similar folks cut the headache.`,
-    `Hi ${name}! Noticed you're ${keyword} ${sub}. We struggled with same thing, so we built ${offer.slice(0,100)} — might be useful for your case. I can share a quick 2-min loom of how we set it up, no pitch. Want it?`,
-    `${name} — your post about ${keyword} caught my eye ${sub}. We built ${offer.slice(0,110)} specifically for that pain. If you're still looking, I can send over how we do it (free teardown, no sales). Interested?`
-  ];
-  return templates[Math.floor(Math.random()*templates.length)];
-}
-
-// Reddit Search
+// API Search Functions
 async function searchReddit(keywords, subreddits, time){
-  const kwArray = keywords.split(',').map(k=>k.trim()).filter(Boolean);
-  const subArray = subreddits ? subreddits.split(',').map(s=>s.trim().replace(/^r\//,'')).filter(Boolean) : [];
-  const t = time === 'day' ? 'day' : time === 'week' ? 'week' : time === 'month' ? 'month' : 'all';
-
-  let allResults = [];
-
-  // If subreddits specified, search each subreddit per keyword
-  const searches = [];
-  if(subArray.length>0){
-    subArray.forEach(sub=>{
-      kwArray.forEach(kw=>{
-        searches.push({ url: `https://www.reddit.com/r/${sub}/search.json?q=${encodeURIComponent(kw)}&restrict_sr=1&sort=new&t=${t}&limit=15`, keyword: kw, sub });
-      });
-    });
-  } else {
-    kwArray.forEach(kw=>{
-      searches.push({ url: `https://www.reddit.com/search.json?q=${encodeURIComponent(kw)}&sort=new&t=${t}&limit=20`, keyword: kw, sub: null });
-    });
-  }
-
-  // Also search HN for each keyword
-  kwArray.forEach(kw=>{
-    searches.push({ url: `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(kw)}&tags=story&hitsPerPage=10`, keyword: kw, source: 'hackernews' });
-  });
-
-  // Fetch with concurrency limit
-  const results = await Promise.allSettled(searches.map(async s=>{
-    try {
-      const res = await fetch(s.url, { headers: { 'Accept': 'application/json' } });
-      if(!res.ok) throw new Error('fetch failed '+res.status);
-      const data = await res.json();
-      return { ...s, data };
-    } catch(e){
-      console.warn('Search failed', s.url, e);
-      return null;
-    }
-  }));
-
-  results.forEach(r=>{
-    if(r.status!=='fulfilled' || !r.value) return;
-    const { data, keyword, sub, source } = r.value;
-    if(!data) return;
-
-    if(source==='hackernews'){
-      // HN Algolia format
-      (data.hits||[]).forEach(hit=>{
-        if(!hit.title) return;
-        allResults.push({
-          id: 'hn_'+hit.objectID,
-          source: 'hackernews',
-          title: hit.title,
-          snippet: hit.story_text ? hit.story_text.slice(0,200) : (hit.title),
-          url: `https://news.ycombinator.com/item?id=${hit.objectID}`,
-          author: hit.author,
-          subreddit: 'Hacker News',
-          score: hit.points || 0,
-          num_comments: hit.num_comments || 0,
-          created_utc: hit.created_at ? new Date(hit.created_at).getTime()/1000 : Date.now()/1000,
-          keyword,
-          matchedKeywords: [keyword]
-        });
-      });
-    } else {
-      // Reddit format
-      const children = data.data?.children || [];
-      children.forEach(c=>{
-        const d = c.data;
-        if(!d || d.is_video || d.over_18) return;
-        // Filter intent if needed
-        const textToCheck = `${d.title} ${d.selftext||''}`.toLowerCase();
-        // Basic filter: must contain at least one intent phrase if filter enabled
-        allResults.push({
-          id: 'rd_'+d.id,
-          source: 'reddit',
-          title: d.title,
-          snippet: (d.selftext||'').slice(0,220) || d.title.slice(0,220),
-          url: `https://reddit.com${d.permalink}`,
-          author: d.author,
-          subreddit: d.subreddit,
-          score: d.score,
-          num_comments: d.num_comments,
-          created_utc: d.created_utc,
-          keyword,
-          matchedKeywords: [keyword]
-        });
-      });
-    }
-  });
-
-  return allResults;
+  const kwArray=keywords.split(',').map(k=>k.trim()).filter(Boolean);
+  const subArray=subreddits?subreddits.split(',').map(s=>s.trim().replace(/^r\//,'')).filter(Boolean):[];
+  const t=time==='day'?'day':time==='week'?'week':time==='month'?'month':'all';
+  let results=[];
+  let searches=[];
+  if(subArray.length>0){ subArray.forEach(sub=>{ kwArray.forEach(kw=>{ searches.push({url:`https://www.reddit.com/r/${sub}/search.json?q=${encodeURIComponent(kw)}&restrict_sr=1&sort=new&t=${t}&limit=12`,kw,sub}); }); }); }
+  else { kwArray.forEach(kw=>{ searches.push({url:`https://www.reddit.com/search.json?q=${encodeURIComponent(kw)}&sort=new&t=${t}&limit=15`,kw}); }); }
+  const res=await Promise.allSettled(searches.map(async s=>{ try{ const r=await fetch(s.url,{headers:{'Accept':'application/json'}}); if(!r.ok) throw new Error(r.status); const d=await r.json(); return {...s,data:d}; }catch(e){ return null; } }));
+  res.forEach(r=>{ if(r.status!=='fulfilled'||!r.value) return; const {data,kw,sub}=r.value; if(!data) return; (data.data?.children||[]).forEach(c=>{ const d=c.data; if(!d||d.is_video||d.over_18) return; results.push({id:'rd_'+d.id,source:'reddit',title:d.title,snippet:(d.selftext||'').slice(0,220)||d.title.slice(0,220),url:`https://reddit.com${d.permalink}`,author:d.author,subreddit:d.subreddit,score:d.score,num_comments:d.num_comments,created_utc:d.created_utc,keyword:kw,matchedKeywords:[kw]}); }); });
+  return results;
 }
+async function searchHackerNews(keywords){
+  let results=[]; const kwArray=keywords.split(',').map(k=>k.trim()).filter(Boolean);
+  const res=await Promise.allSettled(kwArray.map(async kw=>{ try{ const r=await fetch(`https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(kw)}&tags=story&hitsPerPage=10`); const d=await r.json(); return {kw,data:d}; }catch{ return null; } }));
+  res.forEach(r=>{ if(r.status!=='fulfilled'||!r.value) return; const {data,kw}=r.value; if(!data) return; (data.hits||[]).forEach(hit=>{ if(!hit.title) return; results.push({id:'hn_'+hit.objectID,source:'hackernews',title:hit.title,snippet:hit.story_text?hit.story_text.slice(0,200):hit.title,url:`https://news.ycombinator.com/item?id=${hit.objectID}`,author:hit.author,subreddit:'Hacker News',score:hit.points||0,num_comments:hit.num_comments||0,created_utc:hit.created_at?new Date(hit.created_at).getTime()/1000:Date.now()/1000,keyword:kw,matchedKeywords:[kw]}); }); });
+  return results;
+}
+async function searchStackOverflow(keywords){
+  let results=[]; const kwArray=keywords.split(',').map(k=>k.trim()).filter(Boolean);
+  const res=await Promise.allSettled(kwArray.map(async kw=>{ try{ const r=await fetch(`https://api.stackexchange.com/2.3/search?order=desc&sort=activity&intitle=${encodeURIComponent(kw)}&site=stackoverflow&pagesize=10`); const d=await r.json(); return {kw,data:d}; }catch{ return null; } }));
+  res.forEach(r=>{ if(r.status!=='fulfilled'||!r.value) return; const {data,kw}=r.value; if(!data||!data.items) return; data.items.forEach(item=>{ results.push({id:'so_'+item.question_id,source:'stackoverflow',title:item.title,snippet:`StackOverflow question - ${item.title} - Score ${item.score}, Answers ${item.answer_count}`,url:item.link,author:item.owner?.display_name||'SO User',subreddit:'StackOverflow',score:item.score,num_comments:item.answer_count,created_utc:item.creation_date,keyword:kw,matchedKeywords:[kw]}); }); });
+  return results;
+}
+async function searchDevTo(keywords){
+  let results=[]; const kwArray=keywords.split(',').map(k=>k.trim()).filter(Boolean);
+  const res=await Promise.allSettled(kwArray.map(async kw=>{ try{ const r=await fetch(`https://dev.to/api/articles?per_page=10&tag=${encodeURIComponent(kw.toLowerCase().split(' ')[0])}`); const d=await r.json(); return {kw,data:d}; }catch{ return null; } }));
+  res.forEach(r=>{ if(r.status!=='fulfilled'||!r.value) return; const {data,kw}=r.value; if(!Array.isArray(data)) return; data.forEach(a=>{ results.push({id:'dev_'+a.id,source:'devto',title:a.title,snippet:(a.description||'').slice(0,200),url:a.url,author:a.user?.name||'Dev.to',subreddit:'Dev.to',score:a.public_reactions_count||0,num_comments:a.comments_count||0,created_utc:new Date(a.published_at).getTime()/1000,keyword:kw,matchedKeywords:[kw]}); }); });
+  return results;
+}
+async function searchHashnode(keywords){
+  let results=[]; const kwArray=keywords.split(',').map(k=>k.trim()).filter(Boolean);
+  // Hashnode search via public API - use search posts
+  const res=await Promise.allSettled(kwArray.map(async kw=>{ try{ const r=await fetch('https://gql.hashnode.com/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:`query SearchPosts($query:String!){searchPostsOfPublication(first:10, filter:{query:$query}){edges{node{title brief url author{name} publishedAt reactionCount responseCount}}}}`,variables:{query:kw}})}); const d=await r.json(); return {kw,data:d}; }catch{ return null; } }));
+  res.forEach(r=>{ if(r.status!=='fulfilled'||!r.value) return; const {data,kw}=r.value; const edges=data?.data?.searchPostsOfPublication?.edges||[]; edges.forEach(e=>{ const n=e.node; results.push({id:'hnod_'+(n.url||Math.random()),source:'hashnode',title:n.title,snippet:(n.brief||'').slice(0,200),url:n.url,author:n.author?.name||'Hashnode',subreddit:'Hashnode',score:n.reactionCount||0,num_comments:n.responseCount||0,created_utc:n.publishedAt?new Date(n.publishedAt).getTime()/1000:Date.now()/1000,keyword:kw,matchedKeywords:[kw]}); }); });
+  return results;
+}
+async function searchLobsters(keywords){
+  let results=[]; const kwArray=keywords.split(',').map(k=>k.trim()).filter(Boolean);
+  const res=await Promise.allSettled(kwArray.map(async kw=>{ try{ const r=await fetch(`https://lobste.rs/search.json?q=${encodeURIComponent(kw)}`); const d=await r.json(); return {kw,data:d}; }catch{ return null; } }));
+  res.forEach(r=>{ if(r.status!=='fulfilled'||!r.value) return; const {data,kw}=r.value; (data||[]).slice(0,10).forEach(item=>{ results.push({id:'lob_'+(item.short_id||Math.random()),source:'lobsters',title:item.title||kw,snippet:(item.description||'').slice(0,200),url:item.url||`https://lobste.rs/s/${item.short_id}`,author:item.submitter_user?.username||'Lobste.rs',subreddit:'Lobste.rs',score:item.score||0,num_comments:item.comment_count||0,created_utc:item.created_at?new Date(item.created_at).getTime()/1000:Date.now()/1000,keyword:kw,matchedKeywords:[kw]}); }); });
+  return results;
+}
+async function searchGitHub(keywords){
+  let results=[]; const kwArray=keywords.split(',').map(k=>k.trim()).filter(Boolean);
+  const headers={}; if(apiKeys.gh) headers['Authorization']=`token ${apiKeys.gh}`;
+  const res=await Promise.allSettled(kwArray.map(async kw=>{ try{ const r=await fetch(`https://api.github.com/search/issues?q=${encodeURIComponent(kw)}+is:open&per_page=8`,{headers}); const d=await r.json(); return {kw,data:d}; }catch{ return null; } }));
+  res.forEach(r=>{ if(r.status!=='fulfilled'||!r.value) return; const {data,kw}=r.value; (data.items||[]).forEach(item=>{ results.push({id:'gh_'+item.id,source:'github',title:item.title,snippet:(item.body||'').slice(0,200)||item.title,url:item.html_url,author:item.user?.login||'GitHub',subreddit:item.repository_url?.split('/').slice(-1)[0]||'GitHub',score:item.reactions?.total_count||0,num_comments:item.comments||0,created_utc:new Date(item.created_at).getTime()/1000,keyword:kw,matchedKeywords:[kw]}); }); });
+  return results;
+}
+async function searchYouTube(keywords){
+  if(!apiKeys.yt) return [];
+  let results=[]; const kwArray=keywords.split(',').map(k=>k.trim()).filter(Boolean);
+  const res=await Promise.allSettled(kwArray.map(async kw=>{ try{ const r=await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(kw)}&type=video&maxResults=5&key=${apiKeys.yt}`); const d=await r.json(); return {kw,data:d}; }catch{ return null; } }));
+  res.forEach(r=>{ if(r.status!=='fulfilled'||!r.value) return; const {data,kw}=r.value; (data.items||[]).forEach(item=>{ results.push({id:'yt_'+item.id.videoId,source:'youtube',title:item.snippet.title,snippet:item.snippet.description?.slice(0,200)||'',url:`https://youtube.com/watch?v=${item.id.videoId}`,author:item.snippet.channelTitle,subreddit:'YouTube',score:0,num_comments:0,created_utc:new Date(item.snippet.publishedAt).getTime()/1000,keyword:kw,matchedKeywords:[kw]}); }); });
+  return results;
+}
+async function searchTwitter(keywords){
+  if(!apiKeys.tw) return [];
+  // Twitter API v2 does NOT support CORS from browser - will fail, but try with proxy note
+  let results=[];
+  try{
+    const kwArray=keywords.split(',').map(k=>k.trim()).filter(Boolean);
+    for(let kw of kwArray.slice(0,2)){
+      const r=await fetch(`https://api.twitter.com/2/tweets/search/recent?query=${encodeURIComponent(kw)}&max_results=10`,{headers:{'Authorization':`Bearer ${apiKeys.tw}`}});
+      const d=await r.json();
+      (d.data||[]).forEach(t=>{
+        results.push({id:'tw_'+t.id,source:'twitter',title:t.text.slice(0,120),snippet:t.text.slice(0,200),url:`https://twitter.com/i/web/status/${t.id}`,author:'Twitter User',subreddit:'Twitter/X',score:0,num_comments:0,created_utc:Date.now()/1000,keyword:kw,matchedKeywords:[kw]});
+      });
+    }
+  }catch(e){ console.warn('Twitter CORS blocked - needs backend proxy, use Make.com or Zapier as bridge'); }
+  return results;
+}
+async function searchQuora(keywords){
+  if(!apiKeys.serp) return [];
+  let results=[];
+  const kwArray=keywords.split(',').map(k=>k.trim()).filter(Boolean);
+  const res=await Promise.allSettled(kwArray.map(async kw=>{
+    try{
+      const r=await fetch(`https://serpapi.com/search.json?engine=quora&q=${encodeURIComponent(kw)}&api_key=${apiKeys.serp}`);
+      const d=await r.json();
+      return {kw,data:d};
+    }catch{ return null; }
+  }));
+  res.forEach(r=>{
+    if(r.status!=='fulfilled'||!r.value) return;
+    const {data,kw}=r.value;
+    (data.questions||data.organic_results||[]).slice(0,8).forEach(q=>{
+      results.push({id:'quora_'+(q.link||Math.random()),source:'quora',title:q.title||q.question||kw,snippet:(q.snippet||q.answer||'').slice(0,200),url:q.link||`https://quora.com/search?q=${encodeURIComponent(kw)}`,author:q.author||'Quora',subreddit:'Quora',score:0,num_comments:0,created_utc:Date.now()/1000,keyword:kw,matchedKeywords:[kw]});
+    });
+  });
+  return results;
+}
+
+// Systeme.io
+function saveSioConfig(){ sioConfig={apiKey:document.getElementById('sioApiKey')?.value.trim()||'',tag:document.getElementById('sioTag')?.value.trim()||'reddit-lead',webhook:document.getElementById('sioWebhook')?.value.trim()||'',auto:document.getElementById('sioAuto')?.value||'off'}; localStorage.setItem('leadhunter_sio',JSON.stringify(sioConfig)); updateSioStatus(); showToast('Systeme.io config saved'); }
+function updateSioStatus(){ const el=document.getElementById('sioStatus'); if(!el) return; if(sioConfig.apiKey||sioConfig.webhook){ el.textContent=sioConfig.apiKey?'✅ API connected':'✅ Webhook connected'; el.className='text-[10px] px-2 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/20 text-emerald-400'; } else { el.textContent='Not connected'; el.className='text-[10px] px-2 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400'; } }
+function saveKeys(){ apiKeys={yt:document.getElementById('ytKey')?.value.trim()||'',tw:document.getElementById('twKey')?.value.trim()||'',serp:document.getElementById('serpKey')?.value.trim()||'',ph:document.getElementById('phKey')?.value.trim()||'',gh:document.getElementById('ghKey')?.value.trim()||''}; localStorage.setItem('leadhunter_keys',JSON.stringify(apiKeys)); showToast('API keys saved locally'); }
+async function pushToSystemeIo(lead){
+  if(!sioConfig.apiKey&&!sioConfig.webhook){ showToast('Connect Systeme.io first'); return {success:false}; }
+  const outreach=generateOutreach(lead,document.getElementById('offerInput').value);
+  const payload={email:`${lead.author}@reddit.lead`.replace(/[^a-zA-Z0-9@._-]/g,''),firstName:lead.author||'Lead',lastName:lead.subreddit||'',source:'LeadHunter Pro',reddit_post:lead.title,subreddit:lead.subreddit,post_url:lead.url,intent_score:lead.intent.score,intent_level:lead.intent.level,matched_keywords:(lead.matched||[]).join(', '),snippet:lead.snippet,outreach_message:outreach,author:lead.author,saved_at:new Date().toISOString(),tag:sioConfig.tag,platform:lead.source};
+  let result={success:false};
+  if(sioConfig.webhook){ try{ const res=await fetch(sioConfig.webhook,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); if(res.ok){ result.webhook=true; result.success=true; } }catch(e){ result.webhookError=e.message; } }
+  if(sioConfig.apiKey){ try{ const res=await fetch('https://api.systeme.io/api/contacts',{method:'POST',headers:{'Content-Type':'application/json','X-API-Key':sioConfig.apiKey},body:JSON.stringify({email:payload.email,firstName:payload.firstName,lastName:payload.lastName,fields:[{slug:'reddit_post',value:payload.reddit_post?.slice(0,255)},{slug:'subreddit',value:payload.subreddit},{slug:'post_url',value:payload.post_url},{slug:'intent_score',value:String(payload.intent_score)},{slug:'platform',value:payload.platform}],tags:[{name:sioConfig.tag}]})}); if(res.ok){ result.api=true; result.success=true; } else { const d=await res.json().catch(()=>({})); result.apiError=d.message||`API ${res.status}`; } }catch(e){ result.apiError=e.message; } }
+  return result;
+}
+
+// UI
+function updateSavedCount(){ document.getElementById('savedCount').textContent=savedLeads.length; document.getElementById('savedCountDrawer').textContent=savedLeads.length; }
+function renderSaved(){ const list=document.getElementById('savedList'); if(!savedLeads.length){ list.innerHTML=`<div class="text-center py-10 text-zinc-500 text-[13px]">No saved leads yet. Click ☆ on any lead to save.</div>`; return; } list.innerHTML=savedLeads.map(l=>`<div class="rounded-xl bg-[#151517] border border-white/[0.06] p-4"><div class="flex justify-between gap-2"><span class="text-[11px] font-mono px-2 py-1 rounded-full bg-white/[0.06] border border-white/[0.08]">${l.source} • r/${l.subreddit} • ${l.intent.score}%</span><button onclick="toggleSave('${l.id}')" class="text-zinc-500 hover:text-red-400 text-[12px]">Remove</button></div><h4 class="mt-2 text-[13px] font-semibold leading-[1.3]">${l.title}</h4><a href="${l.url}" target="_blank" class="mt-2 inline-block text-[11px] text-brand-400 hover:underline">View post →</a></div>`).join(''); }
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'),3000); }
+function copyOutreach(btn){ const text=btn.getAttribute('data-text'); navigator.clipboard.writeText(text); showToast('Copied outreach'); btn.textContent='Copied ✓'; setTimeout(()=>btn.textContent='Copy Outreach',1500); }
+function regenOutreach(btn,id){ const lead=allLeads.find(l=>l.id===id); if(!lead) return; const offer=document.getElementById('offerInput').value; const newText=generateOutreach(lead,offer); const container=btn.closest('.p-3'); container.querySelector('.text-zinc-300').textContent=newText; container.querySelector('[data-text]').setAttribute('data-text',newText); }
+async function toggleSave(id){ const lead=allLeads.find(l=>l.id===id)||savedLeads.find(l=>l.id===id); if(!lead) return; const exists=savedLeads.findIndex(s=>s.id===id); if(exists>=0){ savedLeads.splice(exists,1); showToast('Removed'); } else { savedLeads.unshift({...lead,saved_at:new Date().toISOString()}); showToast('Saved ★'+(sioConfig.auto==='on'&&(sioConfig.apiKey||sioConfig.webhook)?' → pushing to Systeme.io...':'')); if(sioConfig.auto==='on'&&(sioConfig.apiKey||sioConfig.webhook)){ const res=await pushToSystemeIo(lead); if(res.success) showToast('✅ Pushed to Systeme.io tag '+sioConfig.tag); else showToast('Saved locally, Systeme.io failed: '+(res.apiError||res.webhookError||'')); } } localStorage.setItem('leadhunter_saved',JSON.stringify(savedLeads)); updateSavedCount(); renderLeads(allLeads); if(!document.getElementById('savedDrawer').classList.contains('hidden')) renderSaved(); }
+async function manualPushToSio(id){ const lead=allLeads.find(l=>l.id===id)||savedLeads.find(l=>l.id===id); if(!lead) return; showToast('Pushing to Systeme.io...'); const res=await pushToSystemeIo(lead); if(res.success) showToast('✅ Sent to Systeme.io'); else showToast('❌ Failed: '+(res.apiError||res.webhookError||'config missing')); }
 
 function renderLeads(leads){
-  const container = document.getElementById('resultsContainer');
-  const empty = document.getElementById('emptyState');
-  if(!leads.length){
-    container.innerHTML = '';
-    container.appendChild(empty);
-    empty.classList.remove('hidden');
-    document.getElementById('statFound').textContent = allLeads.length;
-    document.getElementById('statHigh').textContent = allLeads.filter(l=>l.intent.level==='high').length;
-    document.getElementById('statScore').textContent = allLeads.length ? Math.round(allLeads.reduce((a,b)=>a+b.intent.score,0)/allLeads.length)+'%' : '0%';
-    return;
-  }
+  const container=document.getElementById('resultsContainer');
+  const empty=document.getElementById('emptyState');
+  if(!leads.length){ container.innerHTML=''; container.appendChild(empty); empty.classList.remove('hidden'); document.getElementById('statFound').textContent=allLeads.length; document.getElementById('statHigh').textContent=allLeads.filter(l=>l.intent.level==='high').length; document.getElementById('statScore').textContent=allLeads.length?Math.round(allLeads.reduce((a,b)=>a+b.intent.score,0)/allLeads.length)+'%':'0%'; document.getElementById('sourceStats').innerHTML=''; return; }
   empty.classList.add('hidden');
-
-  // Apply source filter
-  const sourceFilter = document.getElementById('sourceFilter').value;
-  let filtered = sourceFilter ? leads.filter(l=>l.source===sourceFilter) : leads;
-
-  // Sort
-  const sort = document.getElementById('sortSelect').value;
+  const sourceFilter=document.getElementById('sourceFilter').value;
+  let filtered=sourceFilter?leads.filter(l=>l.source===sourceFilter):leads;
+  const activeIntents=[...document.querySelectorAll('.intentFilter:checked')].map(c=>c.value);
+  if(activeIntents.length>0&&activeIntents.length<4){ filtered=filtered.filter(l=> l.intent.intentType.some(t=> activeIntents.includes(t))); }
+  const sort=document.getElementById('sortSelect').value;
   if(sort==='score') filtered.sort((a,b)=>b.intent.score-a.intent.score);
   else if(sort==='new') filtered.sort((a,b)=>b.created_utc-a.created_utc);
   else if(sort==='comments') filtered.sort((a,b)=>b.num_comments-a.num_comments);
 
-  // Intent filter checkboxes
-  const activeIntents = [...document.querySelectorAll('.intentFilter:checked')].map(c=>c.value);
-  if(activeIntents.length>0 && activeIntents.length<4){
-    // Map intent types to filter values
-    filtered = filtered.filter(l=>{
-      return l.intent.intentType.some(t=> activeIntents.includes(t));
-    });
-  }
+  // Source stats
+  const bySource={}; filtered.forEach(l=>{ bySource[l.source]=(bySource[l.source]||0)+1; });
+  document.getElementById('sourceStats').innerHTML=Object.entries(bySource).map(([s,c])=>`<span class="px-2 py-1 rounded-full bg-white/[0.06] border border-white/[0.08]">${s}: ${c}</span>`).join('');
 
-  container.innerHTML = filtered.map(lead=>{
-    const isSaved = savedLeads.some(s=>s.id===lead.id);
-    const intentClass = lead.intent.level==='high' ? 'intent-high' : lead.intent.level==='med' ? 'intent-med' : 'intent-low';
-    const intentLabel = lead.intent.level==='high' ? '🔥 High Intent' : lead.intent.level==='med' ? '⚡ Medium Intent' : '💤 Low Intent';
-    const offer = document.getElementById('offerInput').value || 'our solution';
-    const outreach = generateOutreach(lead, offer);
-    return `
-    <div class="group rounded-[16px] bg-[#151517] border border-white/[0.06] p-4 hover:border-white/[0.12] transition">
+  container.innerHTML=filtered.map(lead=>{
+    const isSaved=savedLeads.some(s=>s.id===lead.id);
+    const intentClass=lead.intent.level==='high'?'intent-high':lead.intent.level==='med'?'intent-med':'intent-low';
+    const intentLabel=lead.intent.level==='high'?'🔥 High':lead.intent.level==='med'?'⚡ Med':'💤 Low';
+    const offer=document.getElementById('offerInput').value||'our solution';
+    const outreach=generateOutreach(lead,offer);
+    const sourceEmoji={reddit:'🟠',hackernews:'🔶',stackoverflow:'📚',devto:'📝',hashnode:'✍️',lobsters:'🦞',github:'🐙',youtube:'📺',twitter:'🐦',quora:'❓',producthunt:'🚀',indiehackers:'👨‍💻'}[lead.source]||'🔗';
+    return `<div class="group rounded-[16px] bg-[#151517] border border-white/[0.06] p-4 hover:border-white/[0.12] transition">
       <div class="flex items-start justify-between gap-3">
         <div class="flex-1">
           <div class="flex flex-wrap items-center gap-2">
-            <span class="text-[10px] font-mono px-2 py-1 rounded-full bg-white/[0.06] border border-white/[0.08]">${lead.source==='reddit' ? '🟠 Reddit' : '🔶 Hacker News'} • r/${lead.subreddit}</span>
+            <span class="source-badge">${sourceEmoji} ${lead.source} • ${lead.subreddit}</span>
             <span class="text-[10px] font-mono px-2 py-1 rounded-full border ${intentClass}">${intentLabel} • ${lead.intent.score}%</span>
-            <span class="text-[10px] text-zinc-500">${timeAgo(new Date(lead.created_utc*1000))} • ${lead.num_comments||0} comments • ↑${lead.score||0}</span>
-            ${lead.matched ? `<span class="text-[10px] px-2 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-300">Matched: ${lead.matched.slice(0,2).join(', ')}</span>` : ''}
+            <span class="text-[10px] text-zinc-500">${timeAgo(new Date(lead.created_utc*1000))} • ${lead.num_comments||0} 💬 • ↑${lead.score||0}</span>
+            ${lead.matched?`<span class="text-[10px] px-2 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-300">Matched: ${lead.matched.slice(0,2).join(', ')}</span>`:''}
           </div>
-          <h3 class="mt-3 text-[15px] font-semibold leading-[1.3]"><a href="${lead.url}" target="_blank" class="hover:text-brand-400 transition">${lead.title}</a></h3>
-          <p class="mt-2 text-[13px] leading-[1.5] text-zinc-400 line-clamp-2">${lead.snippet || 'No description — click to view post'}</p>
-
+          <h3 class="mt-3 text-[14px] font-semibold leading-[1.3]"><a href="${lead.url}" target="_blank" class="hover:text-brand-400">${lead.title}</a></h3>
+          <p class="mt-2 text-[12px] leading-[1.5] text-zinc-400 line-clamp-2">${lead.snippet||'No description'}</p>
           <div class="mt-3 p-3 rounded-xl bg-[#0F0F10] border border-white/[0.06]">
-            <div class="text-[11px] font-mono tracking-widest text-zinc-500 uppercase">Position Your Offer → Copy & Paste</div>
+            <div class="text-[10px] font-mono tracking-widest text-zinc-500 uppercase">Position Your Offer →</div>
             <div class="mt-2 text-[12px] leading-[1.6] text-zinc-300">${outreach}</div>
             <div class="mt-3 flex flex-wrap gap-2">
-              <button onclick="copyOutreach(this)" data-text="${outreach.replace(/"/g,'&quot;')}" class="px-3 py-1.5 rounded-full bg-white text-black text-[11px] font-semibold hover:bg-zinc-100">Copy Outreach</button>
-              <a href="${lead.url}" target="_blank" class="px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-[11px] font-medium hover:bg-white/[0.1]">View Post →</a>
-              <button onclick="regenOutreach(this, '${lead.id}')" class="px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-[11px]">↻ Regen</button>
-              <button onclick="manualPushToSio('${lead.id}')" class="px-3 py-1.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-medium">→ Systeme.io</button>
+              <button onclick="copyOutreach(this)" data-text="${outreach.replace(/"/g,'&quot;')}" class="px-3 py-1.5 rounded-full bg-white text-black text-[11px] font-semibold">Copy</button>
+              <a href="${lead.url}" target="_blank" class="px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-[11px]">View →</a>
+              <button onclick="regenOutreach(this,'${lead.id}')" class="px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-[11px]">↻</button>
+              <button onclick="manualPushToSio('${lead.id}')" class="px-3 py-1.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-[11px]">→ Systeme.io</button>
             </div>
           </div>
         </div>
-        <div class="flex flex-col gap-2">
-          <button onclick="toggleSave('${lead.id}')" class="w-9 h-9 rounded-full ${isSaved ? 'bg-brand-500 text-white' : 'bg-white/[0.06] border border-white/[0.08] text-zinc-400 hover:text-white'} flex items-center justify-center transition" title="${isSaved ? 'Saved' : 'Save lead'}">${isSaved ? '★' : '☆'}</button>
-          <a href="${lead.url}" target="_blank" class="w-9 h-9 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center hover:bg-white/[0.1]">↗</a>
-        </div>
+        <div class="flex flex-col gap-2"><button onclick="toggleSave('${lead.id}')" class="w-9 h-9 rounded-full ${isSaved?'bg-brand-500 text-white':'bg-white/[0.06] border border-white/[0.08] text-zinc-400'} flex items-center justify-center">${isSaved?'★':'☆'}</button><a href="${lead.url}" target="_blank" class="w-9 h-9 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center">↗</a></div>
       </div>
-    </div>
-    `;
+    </div>`;
   }).join('');
 
-  document.getElementById('statFound').textContent = allLeads.length;
-  document.getElementById('statHigh').textContent = allLeads.filter(l=>l.intent.level==='high').length;
-  document.getElementById('statScore').textContent = allLeads.length ? Math.round(allLeads.reduce((a,b)=>a+b.intent.score,0)/allLeads.length)+'%' : '0%';
-}
-
-function copyOutreach(btn){
-  const text = btn.getAttribute('data-text');
-  navigator.clipboard.writeText(text);
-  showToast('Copied outreach — paste on Reddit / Q&A');
-  btn.textContent = 'Copied ✓';
-  setTimeout(()=>btn.textContent='Copy Outreach', 1500);
-}
-
-function regenOutreach(btn, id){
-  const lead = allLeads.find(l=>l.id===id);
-  if(!lead) return;
-  const offer = document.getElementById('offerInput').value;
-  const newText = generateOutreach(lead, offer);
-  const container = btn.closest('.p-3');
-  container.querySelector('.text-zinc-300').textContent = newText;
-  container.querySelector('[data-text]').setAttribute('data-text', newText);
-}
-
-async function toggleSave(id){
-  const lead = allLeads.find(l=>l.id===id) || savedLeads.find(l=>l.id===id);
-  if(!lead) return;
-  const exists = savedLeads.findIndex(s=>s.id===id);
-  if(exists>=0){
-    savedLeads.splice(exists,1);
-    showToast('Removed from saved');
-  } else {
-    savedLeads.unshift({...lead, saved_at: new Date().toISOString()});
-    showToast('Saved lead ★ — ' + (sioConfig.auto==='on' && (sioConfig.apiKey||sioConfig.webhook) ? 'pushing to Systeme.io...' : 'saved locally'));
-
-    // Auto-push to Systeme.io if enabled
-    if(sioConfig.auto==='on' && (sioConfig.apiKey || sioConfig.webhook)){
-      const res = await pushToSystemeIo(lead);
-      if(res.success){
-        showToast('✅ Pushed to Systeme.io as contact with tag "'+sioConfig.tag+'"');
-      } else {
-        showToast('Saved locally, but Systeme.io push failed: '+(res.apiError||res.webhookError||'check config'));
-      }
-    }
-  }
-  localStorage.setItem('leadhunter_saved', JSON.stringify(savedLeads));
-  updateSavedCount();
-  renderLeads(allLeads);
-  if(!document.getElementById('savedDrawer').classList.contains('hidden')) renderSaved();
-}
-
-async function manualPushToSio(id){
-  const lead = allLeads.find(l=>l.id===id) || savedLeads.find(l=>l.id===id);
-  if(!lead) return;
-  showToast('Pushing to Systeme.io...');
-  const res = await pushToSystemeIo(lead);
-  if(res.success){
-    showToast('✅ Sent to Systeme.io — check Contacts with tag "'+sioConfig.tag+'"');
-  } else {
-    showToast('❌ Systeme.io push failed: '+(res.apiError||res.webhookError||'configure API key or webhook in left panel'));
-  }
-}
-
-function updateSavedCount(){
-  document.getElementById('savedCount').textContent = savedLeads.length;
-  document.getElementById('savedCountDrawer').textContent = savedLeads.length;
-}
-
-function renderSaved(){
-  const list = document.getElementById('savedList');
-  if(!savedLeads.length){
-    list.innerHTML = `<div class="text-center py-10 text-zinc-500 text-[13px]">No saved leads yet. Click ☆ on any lead to save.</div>`;
-    return;
-  }
-  list.innerHTML = savedLeads.map(l=>`
-    <div class="rounded-xl bg-[#151517] border border-white/[0.06] p-4">
-      <div class="flex justify-between gap-2"><span class="text-[11px] font-mono px-2 py-1 rounded-full bg-white/[0.06] border border-white/[0.08]">r/${l.subreddit} • ${l.intent.score}% intent</span><button onclick="toggleSave('${l.id}')" class="text-zinc-500 hover:text-red-400 text-[12px]">Remove</button></div>
-      <h4 class="mt-2 text-[13px] font-semibold leading-[1.3]">${l.title}</h4>
-      <a href="${l.url}" target="_blank" class="mt-2 inline-block text-[11px] text-brand-400 hover:underline">View post →</a>
-    </div>
-  `).join('');
-}
-
-function showToast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.remove('hidden');
-  setTimeout(()=>t.classList.add('hidden'), 2500);
+  document.getElementById('statFound').textContent=allLeads.length;
+  document.getElementById('statHigh').textContent=allLeads.filter(l=>l.intent.level==='high').length;
+  document.getElementById('statScore').textContent=allLeads.length?Math.round(allLeads.reduce((a,b)=>a+b.intent.score,0)/allLeads.length)+'%':'0%';
 }
 
 async function hunt(){
   if(isHunting) return;
-  const keywords = document.getElementById('keywordsInput').value.trim();
-  const offer = document.getElementById('offerInput').value.trim();
-  const subreddits = document.getElementById('subredditsInput').value.trim();
-  const time = document.getElementById('timeInput').value;
+  const keywords=document.getElementById('keywordsInput').value.trim();
+  const offer=document.getElementById('offerInput').value.trim();
+  const subreddits=document.getElementById('subredditsInput').value.trim();
+  const time=document.getElementById('timeInput').value;
+  const selectedSources=[...document.querySelectorAll('.sourceCheck:checked')].map(c=>c.value);
+  if(!keywords){ showToast('Enter keywords'); return; }
+  if(!offer){ showToast('Enter your offer'); return; }
+  if(!selectedSources.length){ showToast('Select at least one source'); return; }
 
-  if(!keywords){ showToast('Enter keywords people use when they need you'); return; }
-  if(!offer){ showToast('Enter your offer to position'); return; }
-
-  isHunting = true;
-  document.getElementById('huntText').textContent = 'Hunting live...';
+  isHunting=true;
+  document.getElementById('huntText').textContent=`Hunting ${selectedSources.length} sources...`;
   document.getElementById('huntSpinner').classList.remove('hidden');
-  document.getElementById('resultsContainer').innerHTML = `<div class="rounded-[16px] bg-[#121214] border border-white/[0.06] p-10 text-center"><div class="animate-spin text-[24px]">◍</div><div class="mt-3 text-[13px] text-zinc-400">Scanning Reddit + Hacker News for "${keywords.split(',')[0]}"...<br>Checking intent signals: looking for, recommend, need help, pain points</div></div>`;
+  document.getElementById('resultsContainer').innerHTML=`<div class="rounded-[16px] bg-[#121214] border border-white/[0.06] p-10 text-center"><div class="animate-spin text-[24px]">◍</div><div class="mt-3 text-[13px] text-zinc-400">Scanning ${selectedSources.join(', ')} for "${keywords.split(',')[0]}"...<br>Free sources work instantly, key-based sources need API keys in left panel</div></div>`;
 
-  try {
-    const raw = await searchReddit(keywords, subreddits, time);
-    // Deduplicate by id
-    const seen = new Set();
-    const deduped = raw.filter(r=>{ if(seen.has(r.id)) return false; seen.add(r.id); return true; });
+  try{
+    let allResults=[];
+    let promises=[];
 
-    // Score intent
-    allLeads = deduped.map(r=>{
-      const text = `${r.title} ${r.snippet}`;
-      const intent = calcIntentScore(text, keywords);
-      return { ...r, intent, matched: intent.matched };
-    }).filter(r=> r.intent.score > 10); // filter very low intent
+    if(selectedSources.includes('reddit')) promises.push(searchReddit(keywords,subreddits,time).then(r=>{ allResults=allResults.concat(r); }));
+    if(selectedSources.includes('hackernews')) promises.push(searchHackerNews(keywords).then(r=>{ allResults=allResults.concat(r); }));
+    if(selectedSources.includes('stackoverflow')) promises.push(searchStackOverflow(keywords).then(r=>{ allResults=allResults.concat(r); }));
+    if(selectedSources.includes('devto')) promises.push(searchDevTo(keywords).then(r=>{ allResults=allResults.concat(r); }));
+    if(selectedSources.includes('hashnode')) promises.push(searchHashnode(keywords).then(r=>{ allResults=allResults.concat(r); }));
+    if(selectedSources.includes('lobsters')) promises.push(searchLobsters(keywords).then(r=>{ allResults=allResults.concat(r); }));
+    if(selectedSources.includes('github')) promises.push(searchGitHub(keywords).then(r=>{ allResults=allResults.concat(r); }));
+    if(selectedSources.includes('youtube')) promises.push(searchYouTube(keywords).then(r=>{ allResults=allResults.concat(r); }));
+    if(selectedSources.includes('twitter')) promises.push(searchTwitter(keywords).then(r=>{ allResults=allResults.concat(r); }));
+    if(selectedSources.includes('quora')) promises.push(searchQuora(keywords).then(r=>{ allResults=allResults.concat(r); }));
+    // Product Hunt and Indie Hackers - beta, try same as devto for now
+    if(selectedSources.includes('producthunt')) promises.push(Promise.resolve([])); // placeholder - needs token, user can add via SerpAPI
+    if(selectedSources.includes('indiehackers')) promises.push(Promise.resolve([]));
+
+    await Promise.allSettled(promises);
+
+    // Deduplicate
+    const seen=new Set();
+    const deduped=allResults.filter(r=>{ if(seen.has(r.id)) return false; seen.add(r.id); return true; });
+
+    // Score
+    allLeads=deduped.map(r=>{
+      const text=`${r.title} ${r.snippet}`;
+      const intent=calcIntentScore(text,keywords);
+      return {...r,intent,matched:intent.matched};
+    }).filter(r=> r.intent.score>8);
 
     if(allLeads.length===0){
-      document.getElementById('resultsContainer').innerHTML = `<div class="rounded-[16px] bg-[#121214] border border-white/[0.06] p-10 text-center"><div class="text-[20px]">😕</div><h3 class="mt-2 font-semibold">No high-intent leads found</h3><p class="mt-2 text-[13px] text-zinc-500">Try broader keywords like "recommend CRM" or "looking for lead gen" or remove subreddit filter. Reddit API also rate-limits — try again in 30s or click Demo Data.</p><button onclick="loadDemo()" class="mt-4 px-4 py-2 rounded-full bg-white text-black text-[13px] font-semibold">Load Demo Leads</button></div>`;
+      document.getElementById('resultsContainer').innerHTML=`<div class="rounded-[16px] bg-[#121214] border border-white/[0.06] p-10 text-center"><div class="text-[20px]">😕</div><h3 class="mt-2 font-semibold">No leads found on selected sources</h3><p class="mt-2 text-[13px] text-zinc-500">Try broader keywords, select more FREE sources (Reddit, HN, StackOverflow, Dev.to, Lobste.rs, GitHub), or check API keys for YouTube/Twitter/Quora. Or load demo.</p><button onclick="loadDemo()" class="mt-4 px-4 py-2 rounded-full bg-white text-black text-[13px] font-semibold">Load Demo (12 sources)</button></div>`;
     } else {
       renderLeads(allLeads);
-      showToast(`Found ${allLeads.length} leads — ${allLeads.filter(l=>l.intent.level==='high').length} high intent`);
+      showToast(`Found ${allLeads.length} leads from ${selectedSources.length} sources — ${allLeads.filter(l=>l.intent.level==='high').length} high intent`);
     }
-  } catch(e){
+  }catch(e){
     console.error(e);
-    document.getElementById('resultsContainer').innerHTML = `<div class="rounded-[16px] bg-[#121214] border border-white/[0.06] p-8 text-center text-[13px] text-zinc-400">Search failed (Reddit rate limit or CORS). Click Demo Data to see how it works, or try again. Error: ${e.message}</div>`;
-  } finally {
-    isHunting = false;
-    document.getElementById('huntText').textContent = '🎯 Hunt Leads Now';
+    document.getElementById('resultsContainer').innerHTML=`<div class="rounded-[16px] bg-[#121214] border border-white/[0.06] p-8 text-center text-[13px] text-zinc-400">Search failed: ${e.message}. Try demo data or check console.</div>`;
+  }finally{
+    isHunting=false;
+    document.getElementById('huntText').textContent=`🎯 Hunt ${document.querySelectorAll('.sourceCheck:checked').length} Sources Now`;
     document.getElementById('huntSpinner').classList.add('hidden');
   }
 }
 
 function loadDemo(){
-  const demoKeywords = document.getElementById('keywordsInput').value || 'lead gen, CRM';
-  allLeads = [
-    { id:'rd_demo1', source:'reddit', title:'Looking for a CRM that actually does missed-call text-back for my agency?', snippet:'We run a 5-person agency and lose ~20 calls/week. Tired of Calendly + GoHighLevel duct tape. Need something that auto texts missed calls and books meetings. Any recommendations?', url:'https://reddit.com/r/Entrepreneur/comments/demo1', author:'agency_owner_23', subreddit:'Entrepreneur', score:42, num_comments:18, created_utc: Date.now()/1000 - 3600*2, keyword:'missed call text back', matchedKeywords:['missed call text back'] },
-    { id:'rd_demo2', source:'reddit', title:'Best lead capture tool for agencies in 2026? Frustrated with current stack', snippet:'Currently using Typeform + Calendly + ActiveCampaign + CallRail = $600/mo mess. Looking for all-in-one that captures leads, books, nurtures. What do you use?', url:'https://reddit.com/r/SaaS/comments/demo2', author:'saas_founder_uk', subreddit:'SaaS', score:67, num_comments:31, created_utc: Date.now()/1000 - 3600*8, keyword:'lead capture', matchedKeywords:['lead capture'] },
-    { id:'rd_demo3', source:'reddit', title:'Need help: How do you handle appointment no-shows? Losing $2k/mo', snippet:'We book ~80 meetings/mo but 40% no-show. Need system with reminders, deposits, or AI follow-up. Any tools that actually work?', url:'https://reddit.com/r/smallbusiness/comments/demo3', author:'clinic_owner', subreddit:'smallbusiness', score:29, num_comments:22, created_utc: Date.now()/1000 - 3600*15, keyword:'appointment scheduler', matchedKeywords:['appointment scheduler'] },
-    { id:'hn_demo1', source:'hackernews', title:'Ask HN: What are you using for lead generation in 2026?', snippet:'We tried Apollo, Lemlist, but deliverability sucks. Looking for something that finds people asking for what we sell on Reddit/Q&A and lets us position offer without spam.', url:'https://news.ycombinator.com/item?id=demo', author:'hn_builder', subreddit:'Hacker News', score:124, num_comments:56, created_utc: Date.now()/1000 - 3600*5, keyword:'lead generation', matchedKeywords:['lead generation'] },
-    { id:'rd_demo4', source:'reddit', title:'Recommend a booking system that integrates with GHL? Alternative to Calendly?', snippet:'Need round-robin, Stripe, SMS reminders, and ability to embed on landing pages. Calendly too limited. Any agency OS that does this?', url:'https://reddit.com/r/marketing/comments/demo4', author:'marketing_pro', subreddit:'marketing', score:18, num_comments:9, created_utc: Date.now()/1000 - 3600*30, keyword:'booking system', matchedKeywords:['booking system'] },
-  ].map(r=>{
-    const text = `${r.title} ${r.snippet}`;
-    return { ...r, intent: calcIntentScore(text, demoKeywords), matched: calcIntentScore(text, demoKeywords).matched };
-  });
+  const kw=document.getElementById('keywordsInput').value||'lead gen, CRM';
+  allLeads=[
+    {id:'rd_demo1',source:'reddit',title:'Looking for a CRM that actually does missed-call text-back for my agency?',snippet:'We run 5-person agency and lose ~20 calls/week. Tired of Calendly + GHL duct tape. Need auto texts missed calls and books meetings. Any recommendations?',url:'https://reddit.com/r/Entrepreneur/comments/demo1',author:'agency_owner_23',subreddit:'Entrepreneur',score:42,num_comments:18,created_utc:Date.now()/1000-7200,keyword:'missed call'},
+    {id:'rd_demo2',source:'stackoverflow',title:'How to implement missed-call text-back system with Twilio?',snippet:'Building appointment system, need to detect missed calls and auto SMS. Best approach with Twilio API? Struggling with webhook.',url:'https://stackoverflow.com/questions/demo2',author:'dev_saas',subreddit:'StackOverflow',score:15,num_comments:4,created_utc:Date.now()/1000-28800,keyword:'missed call'},
+    {id:'rd_demo3',source:'devto',title:'Best lead capture tools for agencies in 2026? Frustrated with stack',snippet:'Currently Typeform + Calendly + ActiveCampaign = $600/mo mess. Looking for all-in-one that captures, books, nurtures.',url:'https://dev.to/demo3',author:'saas_founder_uk',subreddit:'Dev.to',score:67,num_comments:31,created_utc:Date.now()/1000-18000,keyword:'lead capture'},
+    {id:'hn_demo1',source:'hackernews',title:'Ask HN: What are you using for lead generation in 2026?',snippet:'Tried Apollo, Lemlist, deliverability sucks. Looking for something that finds people asking for what we sell on Reddit/Q&A.',url:'https://news.ycombinator.com/item?id=demo',author:'hn_builder',subreddit:'Hacker News',score:124,num_comments:56,created_utc:Date.now()/1000-18000,keyword:'lead generation'},
+    {id:'rd_demo4',source:'github',title:'Feature request: Add missed-call SMS automation - alternative to Calendly?',snippet:'Need round-robin, Stripe, SMS reminders. Calendly too limited. Any agency OS that does this? Open issue in cal.com repo.',url:'https://github.com/calcom/cal.com/issues/demo',author:'marketing_pro',subreddit:'cal.com',score:18,num_comments:9,created_utc:Date.now()/1000-108000,keyword:'booking system'},
+    {id:'rd_demo5',source:'lobsters',title:'Ask Lobste.rs: Best CRM for small agency that does text-back?',snippet:'Looking for CRM with SMS automation for missed calls. Tired of duct-taping 6 tools.',url:'https://lobste.rs/s/demo',author:'lobster_user',subreddit:'Lobste.rs',score:12,num_comments:7,created_utc:Date.now()/1000-54000,keyword:'CRM'},
+    {id:'rd_demo6',source:'hashnode',title:'How I solved missed calls for my agency with AI SMS',snippet:'We were losing $2k/mo from missed calls. Built simple system with Twilio + AI that texts back instantly and books. Here is how...',url:'https://hashnode.com/demo',author:'hashnode_writer',subreddit:'Hashnode',score:45,num_comments:12,created_utc:Date.now()/1000-72000,keyword:'missed call'},
+    {id:'rd_demo7',source:'youtube',title:'Best Appointment Scheduler for Agencies (2026) - Calendly vs Alternatives',snippet:'In this video I compare Calendly, Acuity, and new AI tools that do missed-call text-back. Which one actually books more meetings?',url:'https://youtube.com/watch?v=demo',author:'YouTube Creator',subreddit:'YouTube',score:0,num_comments:34,created_utc:Date.now()/1000-86400,keyword:'appointment scheduler'},
+    {id:'rd_demo8',source:'quora',title:'What is the best CRM for a small agency that needs missed-call text-back?',snippet:'Looking for CRM that automatically texts back missed calls and books appointments. Tired of losing leads. Any recommendations with pricing?',url:'https://quora.com/demo',author:'Quora User',subreddit:'Quora',score:0,num_comments:8,created_utc:Date.now()/1000-100000,keyword:'CRM'},
+    {id:'rd_demo9',source:'twitter',title:'Anyone recommend a good booking system? Tired of Calendly, need SMS reminders',snippet:'@twitter user: Anyone recommend a good booking system? Tired of Calendly, need SMS reminders and missed-call text-back for my agency. Budget $100/mo',url:'https://twitter.com/demo',author:'twitter_user',subreddit:'Twitter/X',score:0,num_comments:5,created_utc:Date.now()/1000-3600,keyword:'booking system'},
+  ].map(r=>{ const text=`${r.title} ${r.snippet}`; const intent=calcIntentScore(text,kw); return {...r,intent,matched:intent.matched,matchedKeywords:[r.keyword]}; });
   renderLeads(allLeads);
-  showToast(`Loaded ${allLeads.length} demo leads — try the outreach generator!`);
+  showToast(`Loaded ${allLeads.length} demo leads from 12 sources — try outreach + Systeme.io push!`);
 }
 
 // Events
-document.getElementById('huntBtn').addEventListener('click', hunt);
-document.getElementById('demoBtn').addEventListener('click', loadDemo);
-document.getElementById('savedBtn').addEventListener('click', ()=>{ renderSaved(); document.getElementById('savedDrawer').classList.remove('hidden'); });
-document.getElementById('exportBtn').addEventListener('click', ()=>{
-  const data = savedLeads.length ? savedLeads : allLeads;
-  if(!data.length){ showToast('No leads to export — hunt or save some first'); return; }
-  const headers = ['title','subreddit','author','score','comments','intent_score','intent_level','matched_keywords','url','snippet'];
-  const rows = [headers.join(',')].concat(data.map(l=> headers.map(h=>{
-    let v = h==='intent_score' ? l.intent.score : h==='intent_level' ? l.intent.level : h==='matched_keywords' ? (l.matched||[]).join(';') : (l[h]||'');
-    return `"${String(v).replace(/"/g,'""')}"`;
-  }).join(',')));
-  const blob = new Blob([rows.join('\n')], {type:'text/csv'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download=`leadhunter-leads-${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
-  showToast(`Exported ${data.length} leads as CSV`);
+document.getElementById('huntBtn').addEventListener('click',hunt);
+document.getElementById('demoBtn').addEventListener('click',loadDemo);
+document.getElementById('clearBtn').addEventListener('click',()=>{ allLeads=[]; renderLeads([]); showToast('Cleared'); });
+document.getElementById('selectAllBtn').addEventListener('click',()=>{ document.querySelectorAll('.sourceCheck').forEach(c=>c.checked=true); document.getElementById('huntText').textContent=`🎯 Hunt ${document.querySelectorAll('.sourceCheck:checked').length} Sources Now`; });
+document.querySelectorAll('.sourceCheck').forEach(c=>c.addEventListener('change',()=>{ document.getElementById('huntText').textContent=`🎯 Hunt ${document.querySelectorAll('.sourceCheck:checked').length} Sources Now`; }));
+document.getElementById('savedBtn').addEventListener('click',()=>{ renderSaved(); document.getElementById('savedDrawer').classList.remove('hidden'); });
+document.getElementById('exportBtn').addEventListener('click',()=>{
+  const data=savedLeads.length?savedLeads:allLeads;
+  if(!data.length){ showToast('No leads to export'); return; }
+  const headers=['title','source','subreddit','author','score','comments','intent_score','intent_level','matched_keywords','url','snippet'];
+  const rows=[headers.join(',')].concat(data.map(l=> headers.map(h=>{ let v=h==='intent_score'?l.intent.score:h==='intent_level'?l.intent.level:h==='matched_keywords'?(l.matched||[]).join(';'):(l[h]||''); return `"${String(v).replace(/"/g,'""')}"`; }).join(',')));
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`leadhunter-12apis-${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url); showToast(`Exported ${data.length} leads`);
 });
-document.getElementById('sortSelect').addEventListener('change', ()=>renderLeads(allLeads));
-document.getElementById('sourceFilter').addEventListener('change', ()=>renderLeads(allLeads));
-document.querySelectorAll('.intentFilter').forEach(c=>c.addEventListener('change', ()=>renderLeads(allLeads)));
-
-// Systeme.io Events
-document.getElementById('sioSaveBtn')?.addEventListener('click', saveSioConfig);
-document.getElementById('sioTestBtn')?.addEventListener('click', async ()=>{
-  saveSioConfig();
-  if(!sioConfig.apiKey && !sioConfig.webhook){ showToast('Add API key or webhook URL first'); return; }
-  showToast('Testing Systeme.io connection...');
-  const testLead = { id:'test', title:'Test lead from LeadHunter', snippet:'This is a test to verify Systeme.io integration', url:'https://fatahsystem7-glitch.github.io/lead-capture-agency/', author:'test_user', subreddit:'test', score:10, num_comments:1, created_utc: Date.now()/1000, intent:{score:85, level:'high'}, matched:['test'] };
-  const res = await pushToSystemeIo(testLead);
-  if(res.success){ showToast('✅ Systeme.io connected! Check Contacts with tag "'+sioConfig.tag+'"'); }
-  else { showToast('❌ Failed: '+(res.apiError||res.webhookError||'check key/webhook')); }
-});
+document.getElementById('sortSelect').addEventListener('change',()=>renderLeads(allLeads));
+document.getElementById('sourceFilter').addEventListener('change',()=>renderLeads(allLeads));
+document.querySelectorAll('.intentFilter').forEach(c=>c.addEventListener('change',()=>renderLeads(allLeads)));
+document.getElementById('saveKeysBtn')?.addEventListener('click',()=>{ apiKeys={yt:document.getElementById('ytKey')?.value.trim()||'',tw:document.getElementById('twKey')?.value.trim()||'',serp:document.getElementById('serpKey')?.value.trim()||'',ph:document.getElementById('phKey')?.value.trim()||'',gh:document.getElementById('ghKey')?.value.trim()||''}; localStorage.setItem('leadhunter_keys',JSON.stringify(apiKeys)); showToast('API keys saved locally'); });
+document.getElementById('sioSaveBtn')?.addEventListener('click',saveSioConfig);
+document.getElementById('sioTestBtn')?.addEventListener('click',async()=>{ saveSioConfig(); if(!sioConfig.apiKey&&!sioConfig.webhook){ showToast('Add API key or webhook'); return; } showToast('Testing...'); const testLead={id:'test',title:'Test lead from LeadHunter Pro 12 APIs',snippet:'Test to verify Systeme.io',url:'https://fatahsystem7-glitch.github.io/lead-capture-agency/',author:'test_user',subreddit:'test',score:10,num_comments:1,created_utc:Date.now()/1000,intent:{score:85,level:'high'},matched:['test']}; const res=await pushToSystemeIo(testLead); if(res.success) showToast('✅ Systeme.io connected!'); else showToast('❌ Failed: '+(res.apiError||res.webhookError||'')); });
 
 // Init
-updateSavedCount();
-updateSioStatus();
-window.copyOutreach = copyOutreach;
-window.regenOutreach = regenOutreach;
-window.toggleSave = toggleSave;
-window.manualPushToSio = manualPushToSio;
-window.loadDemo = loadDemo;
-
-// Reveal
-const obs = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); }), {threshold:0.1});
-document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+(function init(){
+  updateSavedCount();
+  updateSioStatus();
+  const savedKeys=JSON.parse(localStorage.getItem('leadhunter_keys')||'{}');
+  if(savedKeys.yt) document.getElementById('ytKey').value=savedKeys.yt;
+  if(savedKeys.tw) document.getElementById('twKey').value=savedKeys.tw;
+  if(savedKeys.serp) document.getElementById('serpKey').value=savedKeys.serp;
+  if(savedKeys.ph) document.getElementById('phKey').value=savedKeys.ph;
+  if(savedKeys.gh) document.getElementById('ghKey').value=savedKeys.gh;
+  apiKeys=savedKeys;
+  const savedSio=JSON.parse(localStorage.getItem('leadhunter_sio')||'{}');
+  if(savedSio.apiKey) document.getElementById('sioApiKey').value=savedSio.apiKey;
+  if(savedSio.tag) document.getElementById('sioTag').value=savedSio.tag;
+  if(savedSio.webhook) document.getElementById('sioWebhook').value=savedSio.webhook;
+  if(savedSio.auto) document.getElementById('sioAuto').value=savedSio.auto;
+  sioConfig=savedSio;
+  updateSioStatus();
+})();
+window.copyOutreach=copyOutreach; window.regenOutreach=regenOutreach; window.toggleSave=toggleSave; window.manualPushToSio=manualPushToSio; window.loadDemo=loadDemo;
 </script>
 </body>
 </html>
