@@ -265,11 +265,16 @@
     <div class="flex items-center justify-between"><h3 class="text-[11px] font-mono tracking-widest text-zinc-500 uppercase">Sources (12 APIs)</h3><button id="selectAllBtn" class="text-[11px] text-brand-400 hover:underline">Select all</button></div>
     <div class="mt-3 grid grid-cols-1 gap-2 text-[12px]">
       <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="reddit" checked> 🟠 Reddit</span><span class="text-[10px] text-emerald-400">FREE</span></label>
-      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="hackernews" checked> 🔶 HN</span><span class="text-[10px] text-emerald-400">FREE</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="hackernews" checked> 🔶 Hacker News</span><span class="text-[10px] text-emerald-400">FREE</span></label>
       <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="stackoverflow" checked> 📚 StackOverflow</span><span class="text-[10px] text-emerald-400">FREE</span></label>
       <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="devto" checked> 📝 Dev.to</span><span class="text-[10px] text-emerald-400">FREE</span></label>
-      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="github" checked> 🐙 GitHub</span><span class="text-[10px] text-emerald-400">FREE</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="hashnode" checked> ✍️ Hashnode</span><span class="text-[10px] text-emerald-400">FREE/BETA</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="lobsters" checked> 🦞 Lobste.rs</span><span class="text-[10px] text-emerald-400">FREE</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="github" checked> 🐙 GitHub Issues</span><span class="text-[10px] text-emerald-400">FREE</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="producthunt"> 🚀 Product Hunt</span><span class="text-[10px] text-amber-400">KEY</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="indiehackers"> 👨‍💻 Indie Hackers</span><span class="text-[10px] text-zinc-500">BETA</span></label>
       <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="youtube"> 📺 YouTube</span><span class="text-[10px] text-amber-400">KEY</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="twitter"> 🐦 Twitter/X</span><span class="text-[10px] text-amber-400">KEY</span></label>
       <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="quora"> ❓ Quora (SerpAPI)</span><span class="text-[10px] text-amber-400">KEY</span></label>
     </div>
   </div>
@@ -283,7 +288,7 @@
 <div class="space-y-4">
   <div class="rounded-[16px] bg-[#121214] border border-white/[0.06] p-4 flex flex-wrap items-center justify-between gap-4">
     <div class="flex items-center gap-5"><div><div class="text-[10px] text-zinc-500 uppercase">Found</div><div id="statFound" class="text-[20px] font-bold">0</div></div><div class="w-px h-8 bg-white/[0.08]"></div><div><div class="text-[10px] text-zinc-500 uppercase">High Intent</div><div id="statHigh" class="text-[20px] font-bold text-emerald-400">0</div></div><div><div class="text-[10px] text-zinc-500 uppercase">Avg</div><div id="statScore" class="text-[20px] font-bold">0%</div></div><div id="sourceStats" class="hidden lg:flex gap-2 text-[10px] font-mono flex-wrap max-w-[300px]"></div></div>
-    <div class="flex gap-2"><select id="sortSelect" class="h-8 px-3 rounded-full bg-[#0F0F10] border border-white/[0.08] text-[11px]"><option value="score">Intent</option><option value="new">Newest</option></select><select id="sourceFilter" class="h-8 px-3 rounded-full bg-[#0F0F10] border border-white/[0.08] text-[11px]"><option value="">All</option><option value="reddit">Reddit</option><option value="stackoverflow">StackOverflow</option><option value="github">GitHub</option></select></div>
+    <div class="flex gap-2"><select id="sortSelect" class="h-8 px-3 rounded-full bg-[#0F0F10] border border-white/[0.08] text-[11px]"><option value="score">Intent</option><option value="new">Newest</option></select><select id="sourceFilter" class="h-8 px-3 rounded-full bg-[#0F0F10] border border-white/[0.08] text-[11px]"><option value="">All</option><option value="reddit">Reddit</option><option value="hackernews">HN</option><option value="stackoverflow">StackOverflow</option><option value="devto">Dev.to</option><option value="hashnode">Hashnode</option><option value="lobsters">Lobste.rs</option><option value="github">GitHub</option><option value="producthunt">Product Hunt</option><option value="indiehackers">Indie Hackers</option><option value="youtube">YouTube</option><option value="twitter">Twitter/X</option><option value="quora">Quora</option></select></div>
   </div>
   <div id="resultsContainer" class="space-y-3 min-h-[400px]">
     <div id="emptyState" class="rounded-[20px] bg-[#121214] border border-dashed border-white/[0.08] p-10 text-center"><div class="text-[28px]">🎯</div><h3 class="mt-3 font-semibold">Ready to hunt + Control Panel ready</h3><p class="mt-2 text-[13px] text-zinc-500 max-w-[500px] mx-auto">Click ⚙️ Control Panel to manage everything: leads, customers $49/mo, pricing, APIs, website content, backup. Or hunt now with 12 APIs.</p><div class="mt-4 flex justify-center gap-2"><button onclick="loadDemo()" class="px-5 py-2.5 rounded-full bg-white text-black text-[13px] font-semibold">Load Demo →</button><button onclick="document.getElementById('controlPanel').classList.remove('hidden')" class="px-5 py-2.5 rounded-full bg-amber-500 text-black text-[13px] font-bold">⚙️ Open Control Panel</button></div></div>
@@ -318,7 +323,19 @@ let siteSettings=JSON.parse(localStorage.getItem('leadhunter_site')||'{"siteName
 const INTENT_PHRASES={looking:['looking for','looking to','searching for','recommend','recommendation','suggest'],help:['need help','help with','how to','struggling','stuck','anyone know'],pain:['tired of','frustrated','alternative to','switch from','vs','not working'],buy:['best','pricing','compare','worth it','which one']};
 function calcIntentScore(text,keywords){ const lower=text.toLowerCase(); let score=0,matched=[],intentType=[]; Object.entries(INTENT_PHRASES).forEach(([type,phrases])=>{ phrases.forEach(p=>{ if(lower.includes(p)){ score+=15; matched.push(p); if(!intentType.includes(type)) intentType.push(type); } }); }); keywords.toLowerCase().split(',').map(k=>k.trim()).filter(Boolean).forEach(kw=>{ if(lower.includes(kw.toLowerCase())){ score+=25; matched.push(kw); } }); if(text.includes('?')) score+=10; score=Math.min(100,score); let level=score>=60?'high':score>=30?'med':'low'; return {score,level,matched:[...new Set(matched)].slice(0,5),intentType}; }
 function timeAgo(d){ const diff=Date.now()-new Date(d).getTime(); const m=Math.floor(diff/60000); if(m<60) return `${m}m ago`; const h=Math.floor(m/60); if(h<24) return `${h}h ago`; return `${Math.floor(h/24)}d ago`; }
-function generateOutreach(lead,offer){ const name=lead.author||'there'; const kw=lead.matched?.[0]||lead.keyword||'what you mentioned'; const sub=lead.subreddit?`in r/${lead.subreddit}`:`on ${lead.source}`; const t=[`Hey ${name}, saw your post ${sub} about "${kw}" — super relevant. We built ${offer.slice(0,120)}... that solves exactly that. Happy to share how we handle it if helpful?`,`Hi ${name}! Noticed you're ${kw} ${sub}. We built ${offer.slice(0,100)} — might be useful. Can share quick loom, no pitch. Want it?`]; return t[Math.floor(Math.random()*t.length)]; }
+function generateOutreach(lead,offer){
+  const name=(lead.author||'there').trim();
+  const topic=(lead.matched?.[0]||lead.keyword||lead.subreddit||'this challenge').trim();
+  const title=(lead.title||'your post').trim().slice(0,100);
+  const product=(offer||'our solution').trim().slice(0,140);
+  const variants=[
+    `Hi ${name}, I came across your post about "${title}". We help with ${product}. Would it be useful if I sent a short example?`,
+    `Hey ${name} — your post about ${topic} caught my eye. We built ${product} and it may fit what you are looking for. Happy to share details with no pressure.`,
+    `Hi ${name}, I noticed you are working through ${topic}. Our solution helps with that: ${product}. Would a quick two-minute overview be helpful?`,
+    `Hi ${name}, saw your question on ${lead.source||'the community'}. I may have a practical idea for ${topic}: ${product}. Want me to send it over?`
+  ];
+  return variants[Math.floor(Math.random()*variants.length)];
+}
 function isProUser(){ const p=new URLSearchParams(location.search); if(p.get('access')===SUBSCRIPTION_CONFIG.proParam||p.get('paid')==='1'||p.get('access')==='paid') return true; if(localStorage.getItem('leadhunter_pro')==='true') return true; const lic=p.get('license'); if(lic&&(lic.toLowerCase().includes('pro')||lic.length>=10)) return true; return false; }
 function checkPaywall(){ if(isProUser()) return false; const h=parseInt(localStorage.getItem('leadhunter_huntCount')||'0'); const s=savedLeads.length; if(h>=SUBSCRIPTION_CONFIG.freeHunts||s>=SUBSCRIPTION_CONFIG.freeSaves){ showPaywall(); return true; } return false; }
 function showPaywall(){ document.getElementById('paywallModal')?.classList.remove('hidden'); }
@@ -333,6 +350,56 @@ async function searchHackerNews(kw){ let res=[]; const kws=kw.split(',').map(k=>
 async function searchStackOverflow(kw){ let res=[]; const kws=kw.split(',').map(k=>k.trim()).filter(Boolean); const r=await Promise.allSettled(kws.map(async k=>{ try{ const rr=await fetch(`https://api.stackexchange.com/2.3/search?order=desc&sort=activity&intitle=${encodeURIComponent(k)}&site=stackoverflow&pagesize=8`); const d=await rr.json(); return {kw:k,data:d}; }catch{ return null; } })); r.forEach(x=>{ if(x.status!=='fulfilled'||!x.value) return; const {data,kw}=x.value; (data.items||[]).forEach(it=>{ res.push({id:'so_'+it.question_id,source:'stackoverflow',title:it.title,snippet:it.title,url:it.link,author:it.owner?.display_name||'SO',subreddit:'StackOverflow',score:it.score,num_comments:it.answer_count,created_utc:it.creation_date,keyword:kw}); }); }); return res; }
 async function searchDevTo(kw){ let res=[]; try{ const r=await fetch(`https://dev.to/api/articles?per_page=10&tag=${encodeURIComponent(kw.split(',')[0].split(' ')[0])}`); const d=await r.json(); if(Array.isArray(d)) d.forEach(a=>{ res.push({id:'dev_'+a.id,source:'devto',title:a.title,snippet:a.description||'',url:a.url,author:a.user?.name||'Dev.to',subreddit:'Dev.to',score:a.public_reactions_count||0,num_comments:a.comments_count||0,created_utc:new Date(a.published_at).getTime()/1000,keyword:kw}); }); }catch{} return res; }
 async function searchGitHub(kw){ let res=[]; const kws=kw.split(',').map(k=>k.trim()).filter(Boolean); const headers={}; if(apiKeys.gh) headers['Authorization']=`token ${apiKeys.gh}`; const r=await Promise.allSettled(kws.map(async k=>{ try{ const rr=await fetch(`https://api.github.com/search/issues?q=${encodeURIComponent(k)}+is:open&per_page=6`,{headers}); const d=await rr.json(); return {kw:k,data:d}; }catch{ return null; } })); r.forEach(x=>{ if(x.status!=='fulfilled'||!x.value) return; const {data,kw}=x.value; (data.items||[]).forEach(it=>{ res.push({id:'gh_'+it.id,source:'github',title:it.title,snippet:(it.body||'').slice(0,180),url:it.html_url,author:it.user?.login||'GitHub',subreddit:'GitHub',score:0,num_comments:it.comments||0,created_utc:new Date(it.created_at).getTime()/1000,keyword:kw}); }); }); return res; }
+
+// Additional source connectors (the original control-panel update accidentally hid these).
+async function searchHashnode(keywords){
+  // Hashnode's public GraphQL schema changes periodically. Try its public search query and fail quietly if unavailable.
+  const results=[]; const kws=keywords.split(',').map(k=>k.trim()).filter(Boolean);
+  const query=`query SearchPosts($query:String!){searchPostsOfPublication(first:10,filter:{query:$query}){edges{node{title brief url author{name} publishedAt reactionCount responseCount}}}}`;
+  const res=await Promise.allSettled(kws.map(async kw=>{ try{ const r=await fetch('https://gql.hashnode.com',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,variables:{query:kw}})}); const d=await r.json(); return {kw,data:d}; }catch{return null;} }));
+  res.forEach(x=>{ if(x.status!=='fulfilled'||!x.value) return; const {data,kw}=x.value; (data?.data?.searchPostsOfPublication?.edges||[]).forEach(e=>{ const n=e.node||{}; results.push({id:'hash_'+(n.url||Math.random()),source:'hashnode',title:n.title||kw,snippet:(n.brief||'').slice(0,200),url:n.url||`https://hashnode.com/search?q=${encodeURIComponent(kw)}`,author:n.author?.name||'Hashnode',subreddit:'Hashnode',score:n.reactionCount||0,num_comments:n.responseCount||0,created_utc:n.publishedAt?new Date(n.publishedAt).getTime()/1000:Date.now()/1000,keyword:kw}); }); });
+  return results;
+}
+async function searchLobsters(keywords){
+  const terms=keywords.toLowerCase().split(',').map(k=>k.trim()).filter(Boolean); const results=[];
+  try{
+    const feeds=await Promise.all(['https://lobste.rs/hottest.json','https://lobste.rs/newest.json'].map(u=>fetch(u).then(r=>r.json()).catch(()=>[])));
+    const seen=new Set(); feeds.flat().filter(Boolean).forEach(item=>{ const text=`${item.title||''} ${item.description||''} ${(item.tags||[]).join(' ')}`.toLowerCase(); const kw=terms.find(k=>text.includes(k)); if(!kw||seen.has(item.short_id)) return; seen.add(item.short_id); results.push({id:'lob_'+item.short_id,source:'lobsters',title:item.title||kw,snippet:(item.description||'').slice(0,200),url:item.url||`https://lobste.rs/s/${item.short_id}`,author:item.submitter_user?.username||'Lobste.rs',subreddit:'Lobste.rs',score:item.score||0,num_comments:item.comment_count||0,created_utc:item.created_at?new Date(item.created_at).getTime()/1000:Date.now()/1000,keyword:kw}); });
+  }catch{}
+  return results.slice(0,20);
+}
+async function searchYouTube(keywords){
+  if(!apiKeys.yt) return [];
+  const results=[]; const kws=keywords.split(',').map(k=>k.trim()).filter(Boolean);
+  const res=await Promise.allSettled(kws.map(async kw=>{ try{ const r=await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=5&q=${encodeURIComponent(kw)}&key=${encodeURIComponent(apiKeys.yt)}`); return {kw,data:await r.json()}; }catch{return null;} }));
+  res.forEach(x=>{ if(x.status!=='fulfilled'||!x.value) return; const {data,kw}=x.value; (data.items||[]).forEach(i=>{ const id=i.id?.videoId; if(!id) return; results.push({id:'yt_'+id,source:'youtube',title:i.snippet?.title||kw,snippet:i.snippet?.description||'',url:`https://youtube.com/watch?v=${id}`,author:i.snippet?.channelTitle||'YouTube',subreddit:'YouTube',score:0,num_comments:0,created_utc:i.snippet?.publishedAt?new Date(i.snippet.publishedAt).getTime()/1000:Date.now()/1000,keyword:kw}); }); });
+  return results;
+}
+async function searchTwitter(keywords){
+  if(!apiKeys.tw) return [];
+  const results=[]; const kws=keywords.split(',').map(k=>k.trim()).filter(Boolean);
+  try{ for(const kw of kws.slice(0,2)){ const r=await fetch(`https://api.twitter.com/2/tweets/search/recent?query=${encodeURIComponent(kw)}&max_results=10`,{headers:{Authorization:`Bearer ${apiKeys.tw}`}}); const d=await r.json(); (d.data||[]).forEach(t=>results.push({id:'tw_'+t.id,source:'twitter',title:t.text.slice(0,120),snippet:t.text.slice(0,200),url:`https://twitter.com/i/web/status/${t.id}`,author:'Twitter/X',subreddit:'Twitter/X',score:0,num_comments:0,created_utc:Date.now()/1000,keyword:kw})); } }catch(e){ console.warn('Twitter/X may require a backend proxy because browser CORS can block direct calls.'); }
+  return results;
+}
+async function searchQuora(keywords){
+  if(!apiKeys.serp) return [];
+  const results=[]; const kws=keywords.split(',').map(k=>k.trim()).filter(Boolean);
+  const res=await Promise.allSettled(kws.map(async kw=>{ try{ const r=await fetch(`https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(`site:quora.com ${kw}`)}&api_key=${encodeURIComponent(apiKeys.serp)}`); return {kw,data:await r.json()}; }catch{return null;} }));
+  res.forEach(x=>{ if(x.status!=='fulfilled'||!x.value) return; const {data,kw}=x.value; (data.organic_results||[]).slice(0,8).forEach(q=>results.push({id:'quora_'+(q.link||Math.random()),source:'quora',title:q.title||kw,snippet:(q.snippet||'').slice(0,200),url:q.link||`https://www.quora.com/search?q=${encodeURIComponent(kw)}`,author:'Quora',subreddit:'Quora',score:0,num_comments:0,created_utc:Date.now()/1000,keyword:kw})); });
+  return results;
+}
+async function searchProductHunt(keywords){
+  if(!apiKeys.ph) return [];
+  const terms=keywords.toLowerCase().split(',').map(k=>k.trim()).filter(Boolean); const results=[];
+  try{ const query=`query{posts(first:50){edges{node{id name tagline description url createdAt votesCount commentsCount}}}}`; const r=await fetch('https://api.producthunt.com/v2/api/graphql',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${apiKeys.ph}`},body:JSON.stringify({query})}); const d=await r.json(); (d.data?.posts?.edges||[]).forEach(e=>{ const p=e.node||{}; const text=`${p.name||''} ${p.tagline||''} ${p.description||''}`.toLowerCase(); const kw=terms.find(k=>text.includes(k)); if(!kw) return; results.push({id:'ph_'+p.id,source:'producthunt',title:p.name||kw,snippet:(p.tagline||p.description||'').slice(0,200),url:p.url||'https://www.producthunt.com',author:'Product Hunt',subreddit:'Product Hunt',score:p.votesCount||0,num_comments:p.commentsCount||0,created_utc:p.createdAt?new Date(p.createdAt).getTime()/1000:Date.now()/1000,keyword:kw}); }); }catch{}
+  return results;
+}
+async function searchIndieHackers(keywords){
+  // Indie Hackers has no stable public search API. Use its public search page as a beta connector when CORS permits.
+  const results=[]; const kw=keywords.split(',').map(k=>k.trim()).filter(Boolean)[0]; if(!kw) return results;
+  try{ const r=await fetch(`https://www.indiehackers.com/search?q=${encodeURIComponent(kw)}`); const html=await r.text(); const titleMatches=[...html.matchAll(/<h[1-4][^>]*>([^<]{8,200})<\/h[1-4]>/gi)].slice(0,10); titleMatches.forEach((m,i)=>results.push({id:'ih_'+i+'_'+kw,source:'indiehackers',title:m[1].trim(),snippet:`Indie Hackers result for ${kw}`,url:`https://www.indiehackers.com/search?q=${encodeURIComponent(kw)}`,author:'Indie Hackers',subreddit:'Indie Hackers',score:0,num_comments:0,created_utc:Date.now()/1000,keyword:kw})); }catch{}
+  return results;
+}
 
 // Systeme.io
 function saveSioConfig(){ sioConfig={apiKey:document.getElementById('sioApiKey')?.value.trim()||document.getElementById('ctrl-sioApiKey')?.value.trim()||'',tag:document.getElementById('sioTag')?.value.trim()||document.getElementById('ctrl-sioTag')?.value.trim()||'reddit-lead',webhook:document.getElementById('sioWebhook')?.value.trim()||document.getElementById('ctrl-sioWebhook')?.value.trim()||'',auto:document.getElementById('sioAuto')?.value||document.getElementById('ctrl-sioAuto')?.value||'off'}; localStorage.setItem('leadhunter_sio',JSON.stringify(sioConfig)); updateSioStatus(); showToast('Systeme.io saved'); }
@@ -370,33 +437,64 @@ function renderCtrlLeads(){ const tbody=document.getElementById('ctrl-leadsTable
 
 // Render leads main
 function renderLeads(leads){
-  const container=document.getElementById('resultsContainer'), empty=document.getElementById('emptyState');
-  if(!leads.length){ container.innerHTML=''; container.appendChild(empty); empty.classList.remove('hidden'); document.getElementById('statFound').textContent=allLeads.length; document.getElementById('statHigh').textContent=allLeads.filter(l=>l.intent.level==='high').length; document.getElementById('statScore').textContent=allLeads.length?Math.round(allLeads.reduce((a,b)=>a+b.intent.score,0)/allLeads.length)+'%':'0%'; document.getElementById('sourceStats').innerHTML=''; return; }
-if(empty) empty.classList.add('hidden');
-  const sourceFilter=document.getElementById('sourceFilter').value;
+  const container=document.getElementById('resultsContainer');
+  if(!container) return;
+  const empty=document.getElementById('emptyState');
+  const updateStats=()=>{
+    const found=document.getElementById('statFound');
+    const high=document.getElementById('statHigh');
+    const score=document.getElementById('statScore');
+    const total=document.getElementById('dash-totalLeads');
+    const saved=document.getElementById('dash-savedLeads');
+    const highDash=document.getElementById('dash-highIntent');
+    const avg=document.getElementById('dash-avgScore');
+    const hunts=document.getElementById('dash-huntCount');
+    const sourceStats=document.getElementById('sourceStats');
+    const highCount=allLeads.filter(l=>l.intent&&l.intent.level==='high').length;
+    const avgScore=allLeads.length?Math.round(allLeads.reduce((a,b)=>a+(b.intent?.score||0),0)/allLeads.length)+'%':'0%';
+    if(found) found.textContent=allLeads.length;
+    if(high) high.textContent=highCount;
+    if(score) score.textContent=avgScore;
+    if(total) total.textContent=allLeads.length;
+    if(saved) saved.textContent=savedLeads.length;
+    if(highDash) highDash.textContent=highCount;
+    if(avg) avg.textContent=avgScore;
+    if(hunts) hunts.textContent=localStorage.getItem('leadhunter_huntCount')||'0';
+  };
+  if(!leads.length){
+    container.innerHTML='';
+    if(empty){
+      container.appendChild(empty);
+      empty.classList.remove('hidden');
+    } else {
+      container.innerHTML='<div class="rounded-[20px] bg-[#121214] border border-dashed border-white/[0.08] p-10 text-center"><div class="text-[28px]">🎯</div><h3 class="mt-3 font-semibold">No leads yet</h3><p class="mt-2 text-[13px] text-zinc-500">Enter keywords and start a hunt.</p></div>';
+    }
+    const sourceStats=document.getElementById('sourceStats');
+    if(sourceStats) sourceStats.innerHTML='';
+    updateStats();
+    return;
+  }
+  if(empty) empty.classList.add('hidden');
+  const sourceFilter=document.getElementById('sourceFilter')?.value||'';
   let filtered=sourceFilter?leads.filter(l=>l.source===sourceFilter):leads;
-  const sort=document.getElementById('sortSelect').value;
-  if(sort==='score') filtered.sort((a,b)=>b.intent.score-a.intent.score);
-  else if(sort==='new') filtered.sort((a,b)=>b.created_utc-a.created_utc);
+  const sort=document.getElementById('sortSelect')?.value||'score';
+  if(sort==='score') filtered.sort((a,b)=>(b.intent?.score||0)-(a.intent?.score||0));
+  else if(sort==='new') filtered.sort((a,b)=>(b.created_utc||0)-(a.created_utc||0));
   const bySource={}; filtered.forEach(l=>{ bySource[l.source]=(bySource[l.source]||0)+1; });
-  document.getElementById('sourceStats').innerHTML=Object.entries(bySource).map(([s,c])=>`<span class="px-2 py-1 rounded-full bg-white/[0.06] border">${s}: ${c}</span>`).join('');
+  const sourceStats=document.getElementById('sourceStats');
+  if(sourceStats) sourceStats.innerHTML=Object.entries(bySource).map(([s,c])=>`<span class="px-2 py-1 rounded-full bg-white/[0.06] border">${s}: ${c}</span>`).join('');
+  const offer=document.getElementById('offerInput')?.value||'our solution';
   container.innerHTML=filtered.map(lead=>{
     const isSaved=savedLeads.some(s=>s.id===lead.id);
-    const intentClass=lead.intent.level==='high'?'intent-high':lead.intent.level==='med'?'intent-med':'intent-low';
-    const intentLabel=lead.intent.level==='high'?'🔥 High':lead.intent.level==='med'?'⚡ Med':'💤 Low';
-    const offer=document.getElementById('offerInput').value||'our solution';
+    const intentLevel=lead.intent?.level||'low';
+    const intentScore=lead.intent?.score||0;
+    const intentClass=intentLevel==='high'?'intent-high':intentLevel==='med'?'intent-med':'intent-low';
+    const intentLabel=intentLevel==='high'?'🔥 High':intentLevel==='med'?'⚡ Med':'💤 Low';
     const outreach=generateOutreach(lead,offer);
-    const emoji={reddit:'🟠',hackernews:'🔶',stackoverflow:'📚',devto:'📝',github:'🐙',youtube:'📺',twitter:'🐦',quora:'❓'}[lead.source]||'🔗';
-    return `<div class="rounded-[16px] bg-[#151517] border border-white/[0.06] p-4"><div class="flex justify-between gap-3"><div class="flex-1"><div class="flex flex-wrap gap-2 items-center"><span class="source-badge">${emoji} ${lead.source} • ${lead.subreddit}</span><span class="text-[10px] px-2 py-1 rounded-full border ${intentClass}">${intentLabel} ${lead.intent.score}%</span><span class="text-[10px] text-zinc-500">${timeAgo(new Date(lead.created_utc*1000))} • ${lead.num_comments||0} 💬</span></div><h3 class="mt-2 text-[14px] font-semibold"><a href="${lead.url}" target="_blank" class="hover:text-brand-400">${lead.title}</a></h3><p class="mt-1 text-[12px] text-zinc-400 line-clamp-2">${lead.snippet||''}</p><div class="mt-3 p-3 rounded-xl bg-[#0F0F10] border border-white/[0.06]"><div class="text-[10px] uppercase text-zinc-500">Outreach</div><div class="mt-1 text-[12px] text-zinc-300">${outreach}</div><div class="mt-2 flex gap-2"><button onclick="copyOutreach(this)" data-text="${outreach.replace(/"/g,'&quot;')}" class="px-3 py-1.5 rounded-full bg-white text-black text-[11px] font-semibold">Copy</button><a href="${lead.url}" target="_blank" class="px-3 py-1.5 rounded-full bg-white/[0.06] border text-[11px]">View →</a><button onclick="manualPushToSio('${lead.id}')" class="px-3 py-1.5 rounded-full bg-blue-600 text-white text-[11px]">→ Systeme.io</button></div></div></div><div class="flex flex-col gap-2"><button onclick="toggleSave('${lead.id}')" class="w-9 h-9 rounded-full ${isSaved?'bg-brand-500 text-white':'bg-white/[0.06] border text-zinc-400'} flex items-center justify-center">${isSaved?'★':'☆'}</button></div></div></div>`;
+    const emoji={reddit:'🟠',hackernews:'🔶',stackoverflow:'📚',devto:'📝',github:'🐙',hashnode:'✍️',lobsters:'🦞',producthunt:'🚀',indiehackers:'👨‍💻',youtube:'📺',twitter:'🐦',quora:'❓'}[lead.source]||'🔗';
+    return `<div class="rounded-[16px] bg-[#151517] border border-white/[0.06] p-4"><div class="flex justify-between gap-3"><div class="flex-1"><div class="flex flex-wrap gap-2 items-center"><span class="source-badge">${emoji} ${lead.source} • ${lead.subreddit||''}</span><span class="text-[10px] px-2 py-1 rounded-full border ${intentClass}">${intentLabel} ${intentScore}%</span><span class="text-[10px] text-zinc-500">${timeAgo(new Date((lead.created_utc||Date.now()/1000)*1000))} • ${lead.num_comments||0} 💬</span></div><h3 class="mt-2 text-[14px] font-semibold"><a href="${lead.url||'#'}" target="_blank" class="hover:text-brand-400">${lead.title||'Untitled lead'}</a></h3><p class="mt-1 text-[12px] text-zinc-400 line-clamp-2">${lead.snippet||''}</p><div class="mt-3 p-3 rounded-xl bg-[#0F0F10] border border-white/[0.06]"><div class="text-[10px] uppercase text-zinc-500">Free smart draft — no API key</div><div class="mt-1 text-[12px] text-zinc-300">${outreach}</div><div class="mt-2 flex flex-wrap gap-2"><button onclick="copyOutreach(this)" data-text="${outreach.replace(/"/g,'&quot;')}" class="px-3 py-1.5 rounded-full bg-white text-black text-[11px] font-semibold">Copy</button><button onclick="regenOutreach(this,'${lead.id}')" class="px-3 py-1.5 rounded-full bg-emerald-600/80 text-white text-[11px]">Free Draft</button><a href="${lead.url||'#'}" target="_blank" class="px-3 py-1.5 rounded-full bg-white/[0.06] border text-[11px]">View →</a><button onclick="manualPushToSio('${lead.id}')" class="px-3 py-1.5 rounded-full bg-blue-600 text-white text-[11px]">→ Systeme.io</button></div></div></div><div class="flex flex-col gap-2"><button onclick="toggleSave('${lead.id}')" class="w-9 h-9 rounded-full ${isSaved?'bg-brand-500 text-white':'bg-white/[0.06] border text-zinc-400'} flex items-center justify-center">${isSaved?'★':'☆'}</button></div></div></div>`;
   }).join('');
-  document.getElementById('statFound').textContent=allLeads.length;
-  document.getElementById('statHigh').textContent=allLeads.filter(l=>l.intent.level==='high').length;
-  document.getElementById('statScore').textContent=allLeads.length?Math.round(allLeads.reduce((a,b)=>a+b.intent.score,0)/allLeads.length)+'%':'0%';
-  document.getElementById('dash-totalLeads').textContent=allLeads.length;
-  document.getElementById('dash-savedLeads').textContent=savedLeads.length;
-  document.getElementById('dash-highIntent').textContent=allLeads.filter(l=>l.intent.level==='high').length;
-  document.getElementById('dash-avgScore').textContent=allLeads.length?Math.round(allLeads.reduce((a,b)=>a+b.intent.score,0)/allLeads.length)+'%':'0%';
-  document.getElementById('dash-huntCount').textContent=localStorage.getItem('leadhunter_huntCount')||'0';
+  updateStats();
 }
 function copyOutreach(btn){ navigator.clipboard.writeText(btn.getAttribute('data-text')); showToast('Copied'); btn.textContent='Copied ✓'; setTimeout(()=>btn.textContent='Copy',1500); }
 function regenOutreach(btn,id){ const lead=allLeads.find(l=>l.id===id); if(!lead) return; const offer=document.getElementById('offerInput').value; const newText=generateOutreach(lead,offer); const c=btn.closest('.p-3'); c.querySelector('.text-zinc-300').textContent=newText; c.querySelector('[data-text]').setAttribute('data-text',newText); }
@@ -428,6 +526,13 @@ async function hunt(){
     if(sources.includes('stackoverflow')) promises.push(searchStackOverflow(kw).then(r=>{ all=all.concat(r); }));
     if(sources.includes('devto')) promises.push(searchDevTo(kw).then(r=>{ all=all.concat(r); }));
     if(sources.includes('github')) promises.push(searchGitHub(kw).then(r=>{ all=all.concat(r); }));
+    if(sources.includes('hashnode')) promises.push(searchHashnode(kw).then(r=>{ all=all.concat(r); }));
+    if(sources.includes('lobsters')) promises.push(searchLobsters(kw).then(r=>{ all=all.concat(r); }));
+    if(sources.includes('youtube')) promises.push(searchYouTube(kw).then(r=>{ all=all.concat(r); }));
+    if(sources.includes('twitter')) promises.push(searchTwitter(kw).then(r=>{ all=all.concat(r); }));
+    if(sources.includes('quora')) promises.push(searchQuora(kw).then(r=>{ all=all.concat(r); }));
+    if(sources.includes('producthunt')) promises.push(searchProductHunt(kw).then(r=>{ all=all.concat(r); }));
+    if(sources.includes('indiehackers')) promises.push(searchIndieHackers(kw).then(r=>{ all=all.concat(r); }));
     await Promise.allSettled(promises);
     const seen=new Set(); const dedup=all.filter(r=>{ if(seen.has(r.id)) return false; seen.add(r.id); return true; });
     allLeads=dedup.map(r=>{ const intent=calcIntentScore(`${r.title} ${r.snippet}`,kw); return {...r,intent,matched:intent.matched}; }).filter(r=>r.intent.score>8);
@@ -573,5 +678,5 @@ function updateDashboard(){
 })();
 window.copyOutreach=copyOutreach; window.regenOutreach=regenOutreach; window.toggleSave=toggleSave; window.manualPushToSio=manualPushToSio; window.loadDemo=loadDemo;
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3d7aa53c982fba2',t:'MTc4OTgxMTIwOA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
