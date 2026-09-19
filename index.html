@@ -372,7 +372,7 @@ function renderCtrlLeads(){ const tbody=document.getElementById('ctrl-leadsTable
 function renderLeads(leads){
   const container=document.getElementById('resultsContainer'), empty=document.getElementById('emptyState');
   if(!leads.length){ container.innerHTML=''; container.appendChild(empty); empty.classList.remove('hidden'); document.getElementById('statFound').textContent=allLeads.length; document.getElementById('statHigh').textContent=allLeads.filter(l=>l.intent.level==='high').length; document.getElementById('statScore').textContent=allLeads.length?Math.round(allLeads.reduce((a,b)=>a+b.intent.score,0)/allLeads.length)+'%':'0%'; document.getElementById('sourceStats').innerHTML=''; return; }
-  empty.classList.add('hidden');
+if(empty) empty.classList.add('hidden');
   const sourceFilter=document.getElementById('sourceFilter').value;
   let filtered=sourceFilter?leads.filter(l=>l.source===sourceFilter):leads;
   const sort=document.getElementById('sortSelect').value;
