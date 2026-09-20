@@ -16,6 +16,11 @@
 .intent-high{background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(5,150,105,0.1));border-color:rgba(16,185,129,0.3);color:#10B981}
 .intent-med{background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(217,119,6,0.1));border-color:rgba(245,158,11,0.3);color:#F59E0B}
 .intent-low{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);color:#71717A}
+.support-critical{background:rgba(248,113,113,0.15);border-color:rgba(248,113,113,0.35);color:#FCA5A5}
+.support-howto{background:rgba(96,165,250,0.15);border-color:rgba(96,165,250,0.35);color:#93C5FD}
+.support-billing{background:rgba(245,158,11,0.15);border-color:rgba(245,158,11,0.35);color:#FCD34D}
+.support-resolved{background:rgba(52,211,153,0.15);border-color:rgba(52,211,153,0.35);color:#6EE7B7}
+.support-status{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.10);color:#D4D4D8}
 .source-badge{font-size:10px;font-family:JetBrains Mono;padding:3px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.05)}
 .tab-active{background:white;color:black;font-weight:600}
 .tab-inactive{color:#A1A1AA} .tab-inactive:hover{color:white;background:rgba(255,255,255,0.06)}
@@ -115,7 +120,7 @@
         <div id="tab-leads" class="tab-content hidden space-y-4">
           <h2 class="text-[18px] font-bold">📋 Leads Manager — Control All Found Leads</h2>
           <div class="flex gap-2"><input id="ctrl-leadSearch" placeholder="Search leads..." class="flex-1 h-10 px-4 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[13px]"/><button id="ctrl-exportLeads" class="px-5 h-10 rounded-full bg-white text-black text-[13px] font-semibold">Export CSV</button><button id="ctrl-clearLeads" class="px-5 h-10 rounded-full bg-red-500/10 border border-red-500/20 text-red-300 text-[13px]">Clear All</button></div>
-          <div class="rounded-[16px] overflow-hidden bg-[#121214] border border-white/[0.06]"><div class="overflow-auto max-h-[500px]"><table class="w-full text-left text-[12px]"><thead class="sticky top-0 bg-[#0F0F10] border-b border-white/[0.06] text-[10px] uppercase text-zinc-500"><tr><th class="px-3 py-2">Date</th><th class="px-3 py-2">Source</th><th class="px-3 py-2">Title</th><th class="px-3 py-2">Score</th><th class="px-3 py-2">Actions</th></tr></thead><tbody id="ctrl-leadsTable" class="divide-y divide-white/[0.04]"></tbody></table></div></div>
+          <div class="rounded-[16px] overflow-hidden bg-[#121214] border border-white/[0.06]"><div class="overflow-auto max-h-[500px]"><table class="w-full text-left text-[12px]"><thead class="sticky top-0 bg-[#0F0F10] border-b border-white/[0.06] text-[10px] uppercase text-zinc-500"><tr><th class="px-3 py-2">Date</th><th class="px-3 py-2">Category</th><th class="px-3 py-2">Status</th><th class="px-3 py-2">Source</th><th class="px-3 py-2">Title</th><th class="px-3 py-2">Score</th><th class="px-3 py-2">Actions</th></tr></thead><tbody id="ctrl-leadsTable" class="divide-y divide-white/[0.04]"></tbody></table></div></div>
         </div>
 
         <!-- Customers -->
@@ -178,6 +183,14 @@
                 <div><label class="text-[11px] text-zinc-400">GitHub Token</label><input id="ctrl-ghKey" type="password" placeholder="ghp_..." class="mt-1 w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[11px] font-mono"/></div>
                 <button id="ctrl-saveKeys" class="w-full h-9 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[11px] font-semibold">Save API Keys Locally</button>
               </div>
+            </div>
+            <div class="rounded-[16px] bg-gradient-to-br from-emerald-600/10 to-cyan-600/10 border border-emerald-500/20 p-5 space-y-3">
+              <h3 class="text-[12px] font-semibold text-emerald-300">🛠 Technical Support Drafting</h3>
+              <div><label class="text-[11px] text-zinc-400">Workflow</label><select id="ctrl-workflowMode" class="mt-1 w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[12px]"><option value="support">Technical Customer Service</option><option value="sales">Sales Outreach</option></select></div>
+              <div><label class="text-[11px] text-zinc-400">Product documentation / FAQ links</label><textarea id="ctrl-kbLinks" rows="4" placeholder="One link per line, for example: https://your-site.com/docs\nhttps://your-site.com/faq" class="mt-1 w-full p-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[11px] font-mono"></textarea></div>
+              <div><label class="text-[11px] text-zinc-400">Secure AI backend endpoint (optional)</label><input id="ctrl-aiEndpoint" placeholder="/api/support-draft" class="mt-1 w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[11px] font-mono"/></div>
+              <p class="text-[10px] text-zinc-500">These links are included in the technical-support prompt. GitHub Pages uses a local fallback unless a secure backend endpoint is configured. Never place an OpenRouter key in this public file.</p>
+              <button id="ctrl-saveSupport" class="w-full h-9 rounded-full bg-emerald-600 text-white text-[11px] font-semibold">Save Support Configuration</button>
             </div>
             <div class="rounded-[16px] bg-gradient-to-br from-blue-600/10 to-indigo-600/10 border border-blue-500/20 p-5 space-y-3">
               <h3 class="text-[12px] font-semibold text-blue-300">🔌 Systeme.io Integration</h3>
@@ -255,8 +268,9 @@
 <div class="lg:sticky lg:top-[80px] space-y-4 max-h-[calc(100vh-90px)] overflow-auto scrollbar-none pr-1">
   <div class="rounded-[20px] bg-[#121214] border border-white/[0.08] p-5">
     <h3 class="text-[11px] font-mono tracking-widest text-zinc-500 uppercase">Your Offer</h3>
-    <textarea id="offerInput" rows="3" class="mt-2 w-full p-3 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[13px]">I sell AI appointment setter for agencies that recovers missed calls with instant SMS and books meetings on autopilot</textarea>
-    <h3 class="mt-5 text-[11px] font-mono tracking-widest text-zinc-500 uppercase">Keywords</h3>
+    <textarea id="offerInput" rows="3" class="mt-2 w-full p-3 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[13px]">Lead Radar technical support for lead-hunting, API connections, drafts, and customer accounts</textarea>
+    <div class="mt-3"><label class="text-[11px] text-zinc-500 uppercase">Workflow</label><select id="workflowInput" class="mt-1 w-full h-10 px-3 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[13px]"><option value="support">Technical Customer Service</option><option value="sales">Sales Outreach</option></select></div>
+    <h3 class="mt-5 text-[11px] font-mono tracking-widest text-zinc-500 uppercase">Keywords / issue terms</h3>
     <textarea id="keywordsInput" rows="3" class="mt-2 w-full p-3 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[13px]">looking for appointment scheduler, need lead gen tool, best CRM for agency, missed call text back, need booking system</textarea>
     <div class="mt-4 grid grid-cols-2 gap-3"><div><label class="text-[11px] text-zinc-500 uppercase">Subreddits</label><input id="subredditsInput" placeholder="Entrepreneur, SaaS" class="mt-1 w-full h-10 px-3 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[13px]"/></div><div><label class="text-[11px] text-zinc-500 uppercase">Time</label><select id="timeInput" class="mt-1 w-full h-10 px-3 rounded-xl bg-[#0F0F10] border border-white/[0.08] text-[13px]"><option value="week">Past week</option><option value="month">Past month</option><option value="day">24h</option><option value="all">All time</option></select></div></div>
   </div>
@@ -271,10 +285,10 @@
       <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="hashnode" checked> ✍️ Hashnode</span><span class="text-[10px] text-emerald-400">FREE/BETA</span></label>
       <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="lobsters" checked> 🦞 Lobste.rs</span><span class="text-[10px] text-emerald-400">FREE</span></label>
       <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="github" checked> 🐙 GitHub Issues</span><span class="text-[10px] text-emerald-400">FREE</span></label>
-      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="producthunt"> 🚀 Product Hunt</span><span class="text-[10px] text-amber-400">KEY</span></label>
-      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="indiehackers"> 👨‍💻 Indie Hackers</span><span class="text-[10px] text-zinc-500">BETA</span></label>
-      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="youtube"> 📺 YouTube</span><span class="text-[10px] text-amber-400">KEY</span></label>
-      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="twitter"> 🐦 Twitter/X</span><span class="text-[10px] text-amber-400">KEY</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="producthunt" checked> 🚀 Product Hunt</span><span class="text-[10px] text-amber-400">KEY</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="indiehackers" checked> 👨‍💻 Indie Hackers</span><span class="text-[10px] text-zinc-500">BETA</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="youtube" checked> 📺 YouTube</span><span class="text-[10px] text-amber-400">KEY</span></label>
+      <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="twitter" checked> 🐦 Twitter/X</span><span class="text-[10px] text-amber-400">KEY</span></label>
       <label class="flex items-center justify-between p-2 rounded-lg bg-[#0F0F10] border border-white/[0.06]"><span class="flex items-center gap-2"><input type="checkbox" class="sourceCheck" value="quora"> ❓ Quora (SerpAPI)</span><span class="text-[10px] text-amber-400">KEY</span></label>
     </div>
   </div>
@@ -324,7 +338,14 @@ const DEFAULT_CONFIG = {
     producthunt: "",   // Product Hunt Developer Token
     github: "",        // GitHub Personal Access Token
     systemeIo: ""      // Systeme.io API key
-  }
+  },
+  // All sources are selected by default after browser storage is cleared.
+  sources: ['reddit','hackernews','stackoverflow','devto','hashnode','lobsters','github','producthunt','indiehackers','youtube','twitter','quora'],
+  workflow: 'support',
+  knowledgeBaseLinks: '', // One product documentation or FAQ URL per line.
+  supportCategories: ['Critical Bug','How-To Question','Billing','Resolved'],
+  supportStatuses: ['Open','Needs Reply','Resolved'],
+  aiEndpoint: '' // Secure backend endpoint, for example /api/support-draft
 };
 
 let storedApiKeys={};
@@ -350,23 +371,65 @@ let apiKeys={
   ph:getActiveKey('leadhunter_api_producthunt','producthunt'),
   gh:getActiveKey('leadhunter_api_github','github')
 };
-let siteSettings=JSON.parse(localStorage.getItem('leadhunter_site')||'{"siteName":"LeadHunter Pro","heroTitle":"Hunt buyers on 12 platforms where they ask for what you sell","heroSub":"Reddit, HN, StackOverflow, Dev.to, Hashnode, Lobste.rs, GitHub, YouTube, Twitter, Quora. Enter offer + keywords → finds live posts with buying intent → generates outreach → pushes to Systeme.io. Control everything via Control Panel.","footer":"LeadHunter Pro — 12 APIs","offer":"I sell AI appointment setter for agencies that recovers missed calls with instant SMS and books meetings on autopilot","keywords":"looking for appointment scheduler, need lead gen tool, best CRM for agency, missed call text back, need booking system","price":49,"freeHunts":3,"freeSaves":5}');
+let storedSupportConfig={};
+try{ storedSupportConfig=JSON.parse(localStorage.getItem('leadhunter_support')||'{}')||{}; }catch{ storedSupportConfig={}; }
+let supportConfig={
+  workflow:storedSupportConfig.workflow||DEFAULT_CONFIG.workflow,
+  knowledgeBaseLinks:storedSupportConfig.knowledgeBaseLinks||DEFAULT_CONFIG.knowledgeBaseLinks,
+  aiEndpoint:storedSupportConfig.aiEndpoint||DEFAULT_CONFIG.aiEndpoint
+};
+let siteSettings=JSON.parse(localStorage.getItem('leadhunter_site')||'{"siteName":"LeadHunter Pro","heroTitle":"Hunt buyers on 12 platforms where they ask for what you sell","heroSub":"Reddit, HN, StackOverflow, Dev.to, Hashnode, Lobste.rs, GitHub, YouTube, Twitter, Quora. Enter offer + keywords → finds live posts with buying intent → generates outreach → pushes to Systeme.io. Control everything via Control Panel.","footer":"LeadHunter Pro — 12 APIs","offer":"Lead Radar technical support for lead-hunting, API connections, drafts, and customer accounts","keywords":"error, not working, API key, how to use, billing, login problem, bug","price":49,"freeHunts":3,"freeSaves":5}');
 
 const INTENT_PHRASES={looking:['looking for','looking to','searching for','recommend','recommendation','suggest'],help:['need help','help with','how to','struggling','stuck','anyone know'],pain:['tired of','frustrated','alternative to','switch from','vs','not working'],buy:['best','pricing','compare','worth it','which one']};
 function calcIntentScore(text,keywords){ const lower=text.toLowerCase(); let score=0,matched=[],intentType=[]; Object.entries(INTENT_PHRASES).forEach(([type,phrases])=>{ phrases.forEach(p=>{ if(lower.includes(p)){ score+=15; matched.push(p); if(!intentType.includes(type)) intentType.push(type); } }); }); keywords.toLowerCase().split(',').map(k=>k.trim()).filter(Boolean).forEach(kw=>{ if(lower.includes(kw.toLowerCase())){ score+=25; matched.push(kw); } }); if(text.includes('?')) score+=10; score=Math.min(100,score); let level=score>=60?'high':score>=30?'med':'low'; return {score,level,matched:[...new Set(matched)].slice(0,5),intentType}; }
 function timeAgo(d){ const diff=Date.now()-new Date(d).getTime(); const m=Math.floor(diff/60000); if(m<60) return `${m}m ago`; const h=Math.floor(m/60); if(h<24) return `${h}h ago`; return `${Math.floor(h/24)}d ago`; }
-function generateOutreach(lead,offer){
+function classifySupportTicket(lead){
+  const text=`${lead.title||''} ${lead.snippet||''}`.toLowerCase();
+  if(/\b(resolved|fixed|solved|closed|working now|thank you)\b/.test(text)) return {category:'Resolved',status:'Resolved'};
+  if(/\b(billing|bill|invoice|payment|charge|refund|subscription|price|plan)\b/.test(text)) return {category:'Billing',status:'Needs Reply'};
+  if(/\b(bug|error|crash|broken|failure|failed|not working|down|cannot|can't|exception|500|404|security)\b/.test(text)) return {category:'Critical Bug',status:'Open'};
+  return {category:'How-To Question',status:'Needs Reply'};
+}
+function buildSupportPrompt(lead,offer){
+  const ticket=lead.supportTicket||classifySupportTicket(lead);
+  const knowledgeBase=supportConfig.knowledgeBaseLinks||DEFAULT_CONFIG.knowledgeBaseLinks||'No documentation links supplied.';
+  return `You are a careful technical customer service specialist for ${offer||'the product'}.\nTicket category: ${ticket.category}\nTicket status: ${ticket.status}\nCustomer inquiry: ${lead.title||''}\nCustomer context: ${lead.snippet||''}\nKnowledge base and FAQ links:\n${knowledgeBase}\n\nWrite a clear step-by-step technical resolution. Use the supplied documentation when relevant. Do not write a sales pitch, do not invent unsupported product behavior, ask for the missing diagnostic detail when needed, and finish with a concise next step. Return plain text with numbered steps.`;
+}
+function generateSupportDraft(lead,offer){
+  const name=(lead.author||'there').trim();
+  const ticket=lead.supportTicket||classifySupportTicket(lead);
+  const topic=(lead.title||lead.matched?.[0]||lead.keyword||'the reported issue').trim().slice(0,140);
+  const kb=(supportConfig.knowledgeBaseLinks||'').split(/\r?\n|,/).map(x=>x.trim()).filter(Boolean)[0];
+  const reference=kb?` You can also review ${kb}.`:'';
+  if(ticket.category==='Resolved') return `Hi ${name}, thanks for confirming that the issue is resolved. I am marking this ticket as Resolved. If it returns, please send the exact steps and error message so we can investigate further.`;
+  if(ticket.category==='Billing') return `Hi ${name}, thanks for contacting support about billing.\n\n1. Open your account billing or subscription page.\n2. Confirm the plan, invoice date, and payment method.\n3. Do not submit the payment again if you see a pending charge.\n4. Reply with the invoice number and the email on the account so support can verify it securely.\n\nWe will review the charge and explain the next step.${reference}`;
+  if(ticket.category==='Critical Bug') return `Hi ${name}, I am sorry this is not working.\n\n1. Reproduce the issue once and note the exact time.\n2. Copy the full error message or take a screenshot.\n3. Record the page, browser, device, and steps that caused it.\n4. Try a hard refresh, then retry in a private window.\n5. Reply with those details so we can isolate the failure.\n\nTicket status: Open. We will investigate the technical cause before suggesting a workaround.${reference}`;
+  return `Hi ${name}, thanks for your question about ${topic}.\n\n1. Open the relevant Lead Radar page or Control Panel section.\n2. Check that your account, keywords, and source settings are correct.\n3. Follow the configuration steps shown in the documentation.\n4. Run the Demo first to confirm the interface is working.\n5. If the issue remains, reply with the step where it stopped and any message shown.\n\nTicket status: Needs Reply.${reference}`;
+}
+function generateSalesDraft(lead,offer){
   const name=(lead.author||'there').trim();
   const topic=(lead.matched?.[0]||lead.keyword||lead.subreddit||'this challenge').trim();
   const title=(lead.title||'your post').trim().slice(0,100);
   const product=(offer||'our solution').trim().slice(0,140);
   const variants=[
     `Hi ${name}, I came across your post about "${title}". We help with ${product}. Would it be useful if I sent a short example?`,
-    `Hey ${name} — your post about ${topic} caught my eye. We built ${product} and it may fit what you are looking for. Happy to share details with no pressure.`,
-    `Hi ${name}, I noticed you are working through ${topic}. Our solution helps with that: ${product}. Would a quick two-minute overview be helpful?`,
-    `Hi ${name}, saw your question on ${lead.source||'the community'}. I may have a practical idea for ${topic}: ${product}. Want me to send it over?`
+    `Hey ${name} — your post about ${topic} caught my eye. We built ${product} and it may fit what you are looking for. Happy to share details with no pressure?`,
+    `Hi ${name}, I noticed you are working through ${topic}. Our solution helps with that: ${product}. Would a quick two-minute overview be helpful?`
   ];
   return variants[Math.floor(Math.random()*variants.length)];
+}
+function generateOutreach(lead,offer){
+  return supportConfig.workflow==='sales'?generateSalesDraft(lead,offer):generateSupportDraft(lead,offer);
+}
+async function requestSupportDraft(lead,offer){
+  const endpoint=(supportConfig.aiEndpoint||'').trim();
+  if(!endpoint) return generateSupportDraft(lead,offer);
+  try{
+    const res=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:buildSupportPrompt(lead,offer),lead,knowledgeBaseLinks:supportConfig.knowledgeBaseLinks})});
+    if(!res.ok) throw new Error(`Support AI endpoint returned ${res.status}`);
+    const data=await res.json();
+    return data.draft||data.text||data.output||generateSupportDraft(lead,offer);
+  }catch(err){ console.warn('Support AI endpoint unavailable; using local draft.',err); return generateSupportDraft(lead,offer); }
 }
 function isProUser(){ const p=new URLSearchParams(location.search); if(p.get('access')===SUBSCRIPTION_CONFIG.proParam||p.get('paid')==='1'||p.get('access')==='paid') return true; if(localStorage.getItem('leadhunter_pro')==='true') return true; const lic=p.get('license'); if(lic&&(lic.toLowerCase().includes('pro')||lic.length>=10)) return true; return false; }
 function checkPaywall(){ if(isProUser()) return false; const h=parseInt(localStorage.getItem('leadhunter_huntCount')||'0'); const s=savedLeads.length; if(h>=SUBSCRIPTION_CONFIG.freeHunts||s>=SUBSCRIPTION_CONFIG.freeSaves){ showPaywall(); return true; } return false; }
@@ -470,7 +533,14 @@ function generateCustomerAccount(){
 }
 function renderCustomerList(){ const list=document.getElementById('customerList'); if(!list) return; let customers=JSON.parse(localStorage.getItem('leadhunter_customers')||'[]'); if(!customers.length){ list.innerHTML=`<div class="text-[11px] text-zinc-500 py-4 text-center">No customers yet</div>`; return; } list.innerHTML=customers.map(c=>`<div class="p-3 rounded-lg bg-[#0F0F10] border border-white/[0.06] flex justify-between gap-3"><div class="flex-1"><div class="text-[12px] font-medium">${c.name} — ${c.email}</div><div class="text-[10px] font-mono text-zinc-500">${c.plan} • ${c.license.slice(0,20)}...</div></div><div class="flex gap-1"><button onclick="navigator.clipboard.writeText('${c.license}')" class="px-2 py-1 rounded-full bg-white/[0.06] border text-[10px]">Key</button></div></div>`).join(''); }
 function renderCtrlCustomerList(){ const list=document.getElementById('ctrl-customerList'); if(!list) return; let customers=JSON.parse(localStorage.getItem('leadhunter_customers')||'[]'); if(!customers.length){ list.innerHTML=`<div class="text-[11px] text-zinc-500 py-4 text-center">No customers yet — generate above. Systeme.io auto-creates after $49/mo payment.</div>`; return; } list.innerHTML=customers.map(c=>`<div class="p-3 rounded-lg bg-[#0F0F10] border border-white/[0.06] flex justify-between"><div><div class="text-[12px] font-medium">${c.name} — ${c.email}</div><div class="text-[10px] text-zinc-500">${c.plan} • ${new Date(c.created_at).toLocaleDateString()}</div></div><button onclick="navigator.clipboard.writeText('${c.license}')" class="px-3 py-1 rounded-full bg-white/[0.06] border text-[10px]">Copy Key</button></div>`).join(''); }
-function renderCtrlLeads(){ const tbody=document.getElementById('ctrl-leadsTable'); if(!tbody) return; const search=(document.getElementById('ctrl-leadSearch')?.value||'').toLowerCase(); let leads=savedLeads.length?savedLeads:allLeads; if(search) leads=leads.filter(l=> `${l.title} ${l.subreddit} ${l.author}`.toLowerCase().includes(search)); if(!leads.length){ tbody.innerHTML=`<tr><td colspan="5" class="px-3 py-8 text-center text-zinc-500">No leads</td></tr>`; return; } tbody.innerHTML=leads.map(l=>`<tr class="hover:bg-white/[0.02]"><td class="px-3 py-2 text-[10px] font-mono text-zinc-500">${new Date(l.created_utc*1000).toLocaleDateString()}</td><td class="px-3 py-2"><span class="source-badge">${l.source}</span></td><td class="px-3 py-2 truncate max-w-[300px]">${l.title.slice(0,60)}</td><td class="px-3 py-2 font-mono ${l.intent.level==='high'?'text-emerald-400':''}">${l.intent.score}%</td><td class="px-3 py-2"><button onclick="toggleSave('${l.id}')" class="text-[11px] text-zinc-400 hover:text-red-400">Delete</button></td></tr>`).join(''); }
+function renderCtrlLeads(){
+  const tbody=document.getElementById('ctrl-leadsTable'); if(!tbody) return;
+  const search=(document.getElementById('ctrl-leadSearch')?.value||'').toLowerCase();
+  let leads=savedLeads.length?savedLeads:allLeads;
+  if(search) leads=leads.filter(l=>`${l.title} ${l.subreddit} ${l.author} ${(l.supportTicket||classifySupportTicket(l)).category}`.toLowerCase().includes(search));
+  if(!leads.length){ tbody.innerHTML=`<tr><td colspan="7" class="px-3 py-8 text-center text-zinc-500">No leads</td></tr>`; return; }
+  tbody.innerHTML=leads.map(l=>{ const ticket=l.supportTicket||classifySupportTicket(l); return `<tr class="hover:bg-white/[0.02]"><td class="px-3 py-2 text-[10px] font-mono text-zinc-500">${new Date((l.created_utc||Date.now()/1000)*1000).toLocaleDateString()}</td><td class="px-3 py-2"><span class="source-badge">${ticket.category}</span></td><td class="px-3 py-2 text-[10px] text-zinc-400">${ticket.status}</td><td class="px-3 py-2"><span class="source-badge">${l.source}</span></td><td class="px-3 py-2 truncate max-w-[300px]">${(l.title||'Untitled').slice(0,60)}</td><td class="px-3 py-2 font-mono ${l.intent?.level==='high'?'text-emerald-400':''}">${l.intent?.score||0}%</td><td class="px-3 py-2"><button onclick="toggleSave('${l.id}')" class="text-[11px] text-zinc-400 hover:text-red-400">Delete</button></td></tr>`; }).join('');
+}
 
 // Render leads main
 function renderLeads(leads){
@@ -526,15 +596,17 @@ function renderLeads(leads){
     const intentLevel=lead.intent?.level||'low';
     const intentScore=lead.intent?.score||0;
     const intentClass=intentLevel==='high'?'intent-high':intentLevel==='med'?'intent-med':'intent-low';
-    const intentLabel=intentLevel==='high'?'🔥 High':intentLevel==='med'?'⚡ Med':'💤 Low';
+    const intentLabel=intentLevel==='high'?'High intent':intentLevel==='med'?'Medium intent':'Low intent';
+    const supportTicket=lead.supportTicket||classifySupportTicket(lead);
+    const categoryClass=supportTicket.category==='Critical Bug'?'support-critical':supportTicket.category==='Billing'?'support-billing':supportTicket.category==='Resolved'?'support-resolved':'support-howto';
     const outreach=generateOutreach(lead,offer);
     const emoji={reddit:'🟠',hackernews:'🔶',stackoverflow:'📚',devto:'📝',github:'🐙',hashnode:'✍️',lobsters:'🦞',producthunt:'🚀',indiehackers:'👨‍💻',youtube:'📺',twitter:'🐦',quora:'❓'}[lead.source]||'🔗';
-    return `<div class="rounded-[16px] bg-[#151517] border border-white/[0.06] p-4"><div class="flex justify-between gap-3"><div class="flex-1"><div class="flex flex-wrap gap-2 items-center"><span class="source-badge">${emoji} ${lead.source} • ${lead.subreddit||''}</span><span class="text-[10px] px-2 py-1 rounded-full border ${intentClass}">${intentLabel} ${intentScore}%</span><span class="text-[10px] text-zinc-500">${timeAgo(new Date((lead.created_utc||Date.now()/1000)*1000))} • ${lead.num_comments||0} 💬</span></div><h3 class="mt-2 text-[14px] font-semibold"><a href="${lead.url||'#'}" target="_blank" class="hover:text-brand-400">${lead.title||'Untitled lead'}</a></h3><p class="mt-1 text-[12px] text-zinc-400 line-clamp-2">${lead.snippet||''}</p><div class="mt-3 p-3 rounded-xl bg-[#0F0F10] border border-white/[0.06]"><div class="text-[10px] uppercase text-zinc-500">Free smart draft — no API key</div><div class="mt-1 text-[12px] text-zinc-300">${outreach}</div><div class="mt-2 flex flex-wrap gap-2"><button onclick="copyOutreach(this)" data-text="${outreach.replace(/"/g,'&quot;')}" class="px-3 py-1.5 rounded-full bg-white text-black text-[11px] font-semibold">Copy</button><button onclick="regenOutreach(this,'${lead.id}')" class="px-3 py-1.5 rounded-full bg-emerald-600/80 text-white text-[11px]">Free Draft</button><a href="${lead.url||'#'}" target="_blank" class="px-3 py-1.5 rounded-full bg-white/[0.06] border text-[11px]">View →</a><button onclick="manualPushToSio('${lead.id}')" class="px-3 py-1.5 rounded-full bg-blue-600 text-white text-[11px]">→ Systeme.io</button></div></div></div><div class="flex flex-col gap-2"><button onclick="toggleSave('${lead.id}')" class="w-9 h-9 rounded-full ${isSaved?'bg-brand-500 text-white':'bg-white/[0.06] border text-zinc-400'} flex items-center justify-center">${isSaved?'★':'☆'}</button></div></div></div>`;
+    return `<div class="rounded-[16px] bg-[#151517] border border-white/[0.06] p-4"><div class="flex justify-between gap-3"><div class="flex-1"><div class="flex flex-wrap gap-2 items-center"><span class="source-badge">${emoji} ${lead.source} • ${lead.subreddit||''}</span><span class="text-[10px] px-2 py-1 rounded-full border ${categoryClass}">${supportTicket.category}</span><span class="text-[10px] px-2 py-1 rounded-full border support-status">${supportTicket.status}</span><span class="text-[10px] px-2 py-1 rounded-full border ${intentClass}">Intent ${intentScore}%</span><span class="text-[10px] text-zinc-500">${timeAgo(new Date((lead.created_utc||Date.now()/1000)*1000))} • ${lead.num_comments||0} 💬</span></div><h3 class="mt-2 text-[14px] font-semibold"><a href="${lead.url||'#'}" target="_blank" class="hover:text-brand-400">${lead.title||'Untitled lead'}</a></h3><p class="mt-1 text-[12px] text-zinc-400 line-clamp-2">${lead.snippet||''}</p><div class="mt-3 p-3 rounded-xl bg-[#0F0F10] border border-white/[0.06]"><div class="text-[10px] uppercase text-zinc-500">${supportConfig.workflow==='sales'?'Sales draft':'Technical support draft — no API key'}</div><div class="mt-1 text-[12px] text-zinc-300">${outreach}</div><div class="mt-2 flex flex-wrap gap-2"><button onclick="copyOutreach(this)" data-text="${outreach.replace(/"/g,'&quot;')}" class="px-3 py-1.5 rounded-full bg-white text-black text-[11px] font-semibold">Copy</button><button onclick="regenOutreach(this,'${lead.id}')" class="px-3 py-1.5 rounded-full bg-emerald-600/80 text-white text-[11px]">${supportConfig.workflow==='sales'?'New Draft':'Support Draft'}</button><a href="${lead.url||'#'}" target="_blank" class="px-3 py-1.5 rounded-full bg-white/[0.06] border text-[11px]">View →</a><button onclick="manualPushToSio('${lead.id}')" class="px-3 py-1.5 rounded-full bg-blue-600 text-white text-[11px]">→ Systeme.io</button></div></div></div><div class="flex flex-col gap-2"><button onclick="toggleSave('${lead.id}')" class="w-9 h-9 rounded-full ${isSaved?'bg-brand-500 text-white':'bg-white/[0.06] border text-zinc-400'} flex items-center justify-center">${isSaved?'★':'☆'}</button></div></div></div>`;
   }).join('');
   updateStats();
 }
 function copyOutreach(btn){ navigator.clipboard.writeText(btn.getAttribute('data-text')); showToast('Copied'); btn.textContent='Copied ✓'; setTimeout(()=>btn.textContent='Copy',1500); }
-function regenOutreach(btn,id){ const lead=allLeads.find(l=>l.id===id); if(!lead) return; const offer=document.getElementById('offerInput').value; const newText=generateOutreach(lead,offer); const c=btn.closest('.p-3'); c.querySelector('.text-zinc-300').textContent=newText; c.querySelector('[data-text]').setAttribute('data-text',newText); }
+async function regenOutreach(btn,id){ const lead=allLeads.find(l=>l.id===id)||savedLeads.find(l=>l.id===id); if(!lead) return; const offer=document.getElementById('offerInput')?.value||''; btn.disabled=true; btn.textContent='Drafting...'; const newText=await requestSupportDraft(lead,offer); const c=btn.closest('.p-3'); const textEl=c?.querySelector('.text-zinc-300'); const copyBtn=c?.querySelector('[data-text]'); if(textEl) textEl.textContent=newText; if(copyBtn) copyBtn.setAttribute('data-text',newText); btn.disabled=false; btn.textContent=supportConfig.workflow==='sales'?'New Draft':'Support Draft'; }
 async function toggleSave(id){
   if(!isProUser()&&savedLeads.length>=SUBSCRIPTION_CONFIG.freeSaves){ showPaywall(); return; }
   const lead=allLeads.find(l=>l.id===id)||savedLeads.find(l=>l.id===id); if(!lead) return; const idx=savedLeads.findIndex(s=>s.id===id); if(idx>=0){ savedLeads.splice(idx,1); showToast('Removed'); } else { savedLeads.unshift({...lead,saved_at:new Date().toISOString()}); showToast('Saved ★'); if(sioConfig.auto==='on'&&(sioConfig.apiKey||sioConfig.webhook)){ const r=await pushToSystemeIo(lead); if(r.success) showToast('✅ Pushed to Systeme.io'); } } localStorage.setItem('leadhunter_saved',JSON.stringify(savedLeads)); updateSavedCount(); updateFreeBadges(); renderLeads(allLeads); renderCtrlLeads(); if(!document.getElementById('savedDrawer').classList.contains('hidden')) renderSaved();
@@ -572,7 +644,7 @@ async function hunt(){
     if(sources.includes('indiehackers')) promises.push(searchIndieHackers(kw).then(r=>{ all=all.concat(r); }));
     await Promise.allSettled(promises);
     const seen=new Set(); const dedup=all.filter(r=>{ if(seen.has(r.id)) return false; seen.add(r.id); return true; });
-    allLeads=dedup.map(r=>{ const intent=calcIntentScore(`${r.title} ${r.snippet}`,kw); return {...r,intent,matched:intent.matched}; }).filter(r=>r.intent.score>8);
+    allLeads=dedup.map(r=>{ const intent=calcIntentScore(`${r.title} ${r.snippet}`,kw); const supportTicket=classifySupportTicket(r); return {...r,intent,matched:intent.matched,supportTicket}; }).filter(r=>r.intent.score>8);
     if(!allLeads.length){ document.getElementById('resultsContainer').innerHTML=`<div class="rounded-[16px] bg-[#121214] border p-10 text-center"><div>😕</div><h3 class="mt-2 font-semibold">No leads</h3><button onclick="loadDemo()" class="mt-3 px-4 py-2 rounded-full bg-white text-black text-[13px] font-semibold">Load Demo</button></div>`; }
     else { renderLeads(allLeads); showToast(`Found ${allLeads.length} leads`); }
   }catch(e){ document.getElementById('resultsContainer').innerHTML=`<div class="p-8 text-center text-[13px] text-zinc-500">Error: ${e.message}</div>`; }
@@ -585,7 +657,7 @@ function loadDemo(){
     {id:'so1',source:'stackoverflow',title:'How to implement missed-call text-back with Twilio?',snippet:'Need webhook for missed calls',url:'https://stackoverflow.com/q/demo',author:'dev',subreddit:'StackOverflow',score:15,num_comments:4,created_utc:Date.now()/1000-28800,keyword:'missed call'},
     {id:'dev1',source:'devto',title:'Best lead capture tools for agencies?',snippet:'Typeform + Calendly mess',url:'https://dev.to/demo',author:'founder',subreddit:'Dev.to',score:67,num_comments:31,created_utc:Date.now()/1000-18000,keyword:'lead capture'},
     {id:'gh1',source:'github',title:'Feature request: SMS automation alternative to Calendly?',snippet:'Need SMS reminders',url:'https://github.com/calcom/cal.com/issues/demo',author:'marketing',subreddit:'cal.com',score:18,num_comments:9,created_utc:Date.now()/1000-108000,keyword:'booking'},
-  ].map(r=>{ const intent=calcIntentScore(`${r.title} ${r.snippet}`,kw); return {...r,intent,matched:intent.matched}; });
+  ].map(r=>{ const intent=calcIntentScore(`${r.title} ${r.snippet}`,kw); const supportTicket=classifySupportTicket(r); return {...r,intent,matched:intent.matched,supportTicket}; });
   renderLeads(allLeads); showToast('Demo loaded');
 }
 
@@ -664,6 +736,14 @@ document.getElementById('ctrl-saveKeys')?.addEventListener('click',()=>{
   localStorage.setItem('leadhunter_api_youtube',apiKeys.yt); localStorage.setItem('leadhunter_api_twitter',apiKeys.tw); localStorage.setItem('leadhunter_api_serpapi',apiKeys.serp); localStorage.setItem('leadhunter_api_producthunt',apiKeys.ph); localStorage.setItem('leadhunter_api_github',apiKeys.gh);
   showToast('API keys saved — UI values override defaults');
 });
+document.getElementById('ctrl-saveSupport')?.addEventListener('click',()=>{
+  supportConfig.workflow=document.getElementById('ctrl-workflowMode')?.value||DEFAULT_CONFIG.workflow;
+  supportConfig.knowledgeBaseLinks=document.getElementById('ctrl-kbLinks')?.value.trim()||'';
+  supportConfig.aiEndpoint=document.getElementById('ctrl-aiEndpoint')?.value.trim()||'';
+  localStorage.setItem('leadhunter_support',JSON.stringify(supportConfig));
+  const wf=document.getElementById('workflowInput'); if(wf) wf.value=supportConfig.workflow;
+  showToast('Technical support configuration saved');
+});
 document.getElementById('ctrl-sioSave')?.addEventListener('click',saveSioConfig);
 document.getElementById('ctrl-sioTest')?.addEventListener('click',async()=>{ saveSioConfig(); showToast('Testing...'); const test={id:'test',title:'Test',snippet:'Test',url:location.href,author:'test',subreddit:'test',score:10,num_comments:1,created_utc:Date.now()/1000,intent:{score:85,level:'high'},matched:['test']}; const r=await pushToSystemeIo(test); if(r.success) showToast('✅ Systeme.io OK'); else showToast('❌ Failed'); });
 document.getElementById('ctrl-generateAccount')?.addEventListener('click',generateCustomerAccount);
@@ -709,7 +789,8 @@ function updateDashboard(){
   fill('ctrl-offer',siteSettings.offer); fill('ctrl-keywords',siteSettings.keywords); fill('ctrl-subreddits',siteSettings.subreddits); fill('ctrl-time',siteSettings.time);
   fill('ctrl-siteName',siteSettings.siteName); fill('ctrl-heroTitle',siteSettings.heroTitle); fill('ctrl-heroSub',siteSettings.heroSub); fill('ctrl-footer',siteSettings.footer);
   fill('ctrl-price',siteSettings.price); fill('ctrl-freeHunts',siteSettings.freeHunts); fill('ctrl-freeSaves',siteSettings.freeSaves); fill('ctrl-stripeLink',siteSettings.stripeLink); fill('ctrl-sioLink',siteSettings.sioLink);
-  fill('offerInput',siteSettings.offer); fill('keywordsInput',siteSettings.keywords); fill('subredditsInput',siteSettings.subreddits); fill('timeInput',siteSettings.time);
+  fill('ctrl-workflowMode',supportConfig.workflow); fill('ctrl-kbLinks',supportConfig.knowledgeBaseLinks); fill('ctrl-aiEndpoint',supportConfig.aiEndpoint);
+  fill('offerInput',siteSettings.offer); fill('keywordsInput',siteSettings.keywords); fill('subredditsInput',siteSettings.subreddits); fill('timeInput',siteSettings.time); fill('workflowInput',supportConfig.workflow);
   // Pre-fill the APIs & Systeme.io panel with the active values.
   fill('ytKey',apiKeys.yt); fill('twKey',apiKeys.tw); fill('serpKey',apiKeys.serp); fill('phKey',apiKeys.ph); fill('ghKey',apiKeys.gh);
   fill('ctrl-ytKey',apiKeys.yt); fill('ctrl-twKey',apiKeys.tw); fill('ctrl-serpKey',apiKeys.serp); fill('ctrl-phKey',apiKeys.ph); fill('ctrl-ghKey',apiKeys.gh);
@@ -719,5 +800,5 @@ function updateDashboard(){
 })();
 window.copyOutreach=copyOutreach; window.regenOutreach=regenOutreach; window.toggleSave=toggleSave; window.manualPushToSio=manualPushToSio; window.loadDemo=loadDemo;
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3df696ced08f5b8',t:'MTc4OTg5MjQzNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3dfb054285d7bf8',t:'MTc4OTg5NTM0MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
