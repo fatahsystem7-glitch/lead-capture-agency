@@ -25,6 +25,10 @@
 .tab-active{background:white;color:black;font-weight:600}
 .tab-inactive{color:#A1A1AA} .tab-inactive:hover{color:white;background:rgba(255,255,255,0.06)}
 </style>
+<!-- Secure account gate. Configure supabase-config.js before deploying this version. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="secure-auth-client.js"></script>
 </head>
 <body class="font-sans text-zinc-100">
 
@@ -188,6 +192,7 @@
               <h3 class="text-[12px] font-semibold text-emerald-300">🛠 Technical Support Drafting</h3>
               <div><label class="text-[11px] text-zinc-400">Workflow</label><select id="ctrl-workflowMode" class="mt-1 w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[12px]"><option value="support">Technical Customer Service</option><option value="sales">Sales Outreach</option></select></div>
               <div><label class="text-[11px] text-zinc-400">Product documentation / FAQ links</label><textarea id="ctrl-kbLinks" rows="4" placeholder="One link per line, for example: https://your-site.com/docs\nhttps://your-site.com/faq" class="mt-1 w-full p-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[11px] font-mono"></textarea></div>
+              <div><label class="text-[11px] text-zinc-400">OpenRouter API key</label><input id="ctrl-openRouterKey" type="password" placeholder="Stored securely; enter only to replace" class="mt-1 w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[11px] font-mono"/></div>
               <div><label class="text-[11px] text-zinc-400">Secure AI backend endpoint (optional)</label><input id="ctrl-aiEndpoint" placeholder="/api/support-draft" class="mt-1 w-full h-9 px-3 rounded-lg bg-[#0F0F10] border border-white/[0.08] text-[11px] font-mono"/></div>
               <p class="text-[10px] text-zinc-500">These links are included in the technical-support prompt. GitHub Pages uses a local fallback unless a secure backend endpoint is configured. Never place an OpenRouter key in this public file.</p>
               <button id="ctrl-saveSupport" class="w-full h-9 rounded-full bg-emerald-600 text-white text-[11px] font-semibold">Save Support Configuration</button>
@@ -371,13 +376,21 @@ let apiKeys={
   ph:getActiveKey('leadhunter_api_producthunt','producthunt'),
   gh:getActiveKey('leadhunter_api_github','github')
 };
-let storedSupportConfig={};
-try{ storedSupportConfig=JSON.parse(localStorage.getItem('leadhunter_support')||'{}')||{}; }catch{ storedSupportConfig={}; }
+// Support settings are loaded from Supabase after paid authentication.
+// Defaults are used only until the authenticated settings row is loaded.
 let supportConfig={
-  workflow:storedSupportConfig.workflow||DEFAULT_CONFIG.workflow,
-  knowledgeBaseLinks:storedSupportConfig.knowledgeBaseLinks||DEFAULT_CONFIG.knowledgeBaseLinks,
-  aiEndpoint:storedSupportConfig.aiEndpoint||DEFAULT_CONFIG.aiEndpoint
+  workflow:DEFAULT_CONFIG.workflow,
+  knowledgeBaseLinks:DEFAULT_CONFIG.knowledgeBaseLinks,
+  aiEndpoint:DEFAULT_CONFIG.aiEndpoint
 };
+window.addEventListener('leadHunterSettingsLoaded',event=>{
+  const settings=event.detail||{};
+  supportConfig.workflow=settings.workflow||DEFAULT_CONFIG.workflow;
+  supportConfig.knowledgeBaseLinks=settings.knowledge_base_links||DEFAULT_CONFIG.knowledgeBaseLinks;
+  supportConfig.aiEndpoint=settings.ai_endpoint||DEFAULT_CONFIG.aiEndpoint;
+  const set=(id,value)=>{const el=document.getElementById(id);if(el&&value!==undefined)el.value=value;};
+  set('ctrl-workflowMode',supportConfig.workflow);set('ctrl-kbLinks',supportConfig.knowledgeBaseLinks);set('ctrl-aiEndpoint',supportConfig.aiEndpoint);set('workflowInput',supportConfig.workflow);
+});
 let siteSettings=JSON.parse(localStorage.getItem('leadhunter_site')||'{"siteName":"LeadHunter Pro","heroTitle":"Hunt buyers on 12 platforms where they ask for what you sell","heroSub":"Reddit, HN, StackOverflow, Dev.to, Hashnode, Lobste.rs, GitHub, YouTube, Twitter, Quora. Enter offer + keywords → finds live posts with buying intent → generates outreach → pushes to Systeme.io. Control everything via Control Panel.","footer":"LeadHunter Pro — 12 APIs","offer":"Lead Radar technical support for lead-hunting, API connections, drafts, and customer accounts","keywords":"error, not working, API key, how to use, billing, login problem, bug","price":49,"freeHunts":3,"freeSaves":5}');
 
 const INTENT_PHRASES={looking:['looking for','looking to','searching for','recommend','recommendation','suggest'],help:['need help','help with','how to','struggling','stuck','anyone know'],pain:['tired of','frustrated','alternative to','switch from','vs','not working'],buy:['best','pricing','compare','worth it','which one']};
@@ -422,6 +435,10 @@ function generateOutreach(lead,offer){
   return supportConfig.workflow==='sales'?generateSalesDraft(lead,offer):generateSupportDraft(lead,offer);
 }
 async function requestSupportDraft(lead,offer){
+  try{
+    const secureDraft=await window.LEADHUNTER_AUTH?.requestSupportDraft?.(lead,offer,supportConfig.knowledgeBaseLinks);
+    if(secureDraft) return secureDraft;
+  }catch(err){ console.warn('Secure support draft unavailable; using fallback.',err); }
   const endpoint=(supportConfig.aiEndpoint||'').trim();
   if(!endpoint) return generateSupportDraft(lead,offer);
   try{
@@ -736,13 +753,21 @@ document.getElementById('ctrl-saveKeys')?.addEventListener('click',()=>{
   localStorage.setItem('leadhunter_api_youtube',apiKeys.yt); localStorage.setItem('leadhunter_api_twitter',apiKeys.tw); localStorage.setItem('leadhunter_api_serpapi',apiKeys.serp); localStorage.setItem('leadhunter_api_producthunt',apiKeys.ph); localStorage.setItem('leadhunter_api_github',apiKeys.gh);
   showToast('API keys saved — UI values override defaults');
 });
-document.getElementById('ctrl-saveSupport')?.addEventListener('click',()=>{
+document.getElementById('ctrl-saveSupport')?.addEventListener('click',async()=>{
   supportConfig.workflow=document.getElementById('ctrl-workflowMode')?.value||DEFAULT_CONFIG.workflow;
   supportConfig.knowledgeBaseLinks=document.getElementById('ctrl-kbLinks')?.value.trim()||'';
   supportConfig.aiEndpoint=document.getElementById('ctrl-aiEndpoint')?.value.trim()||'';
-  localStorage.setItem('leadhunter_support',JSON.stringify(supportConfig));
+  const openRouterKey=document.getElementById('ctrl-openRouterKey')?.value.trim()||'';
+  if(openRouterKey){
+    try{ if(!window.LEADHUNTER_AUTH?.saveOpenRouterKey) throw new Error('Secure account setup is not configured yet'); await window.LEADHUNTER_AUTH.saveOpenRouterKey(openRouterKey); document.getElementById('ctrl-openRouterKey').value=''; }
+    catch(err){ showToast(`Could not save OpenRouter key securely: ${err.message}`); return; }
+  }
+  try{
+    if(!window.LEADHUNTER_AUTH?.saveSupportSettings) throw new Error('Secure account setup is not configured yet');
+    await window.LEADHUNTER_AUTH.saveSupportSettings(supportConfig);
+  }catch(err){ showToast(`Could not save settings securely: ${err.message}`); return; }
   const wf=document.getElementById('workflowInput'); if(wf) wf.value=supportConfig.workflow;
-  showToast('Technical support configuration saved');
+  showToast('Technical support configuration saved securely');
 });
 document.getElementById('ctrl-sioSave')?.addEventListener('click',saveSioConfig);
 document.getElementById('ctrl-sioTest')?.addEventListener('click',async()=>{ saveSioConfig(); showToast('Testing...'); const test={id:'test',title:'Test',snippet:'Test',url:location.href,author:'test',subreddit:'test',score:10,num_comments:1,created_utc:Date.now()/1000,intent:{score:85,level:'high'},matched:['test']}; const r=await pushToSystemeIo(test); if(r.success) showToast('✅ Systeme.io OK'); else showToast('❌ Failed'); });
@@ -800,5 +825,5 @@ function updateDashboard(){
 })();
 window.copyOutreach=copyOutreach; window.regenOutreach=regenOutreach; window.toggleSave=toggleSave; window.manualPushToSio=manualPushToSio; window.loadDemo=loadDemo;
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3dfb054285d7bf8',t:'MTc4OTg5NTM0MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3e0997bd98e66ee',t:'MTc4OTkwNDg5MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
