@@ -314,10 +314,42 @@
 
 <script>
 // Subscription Config
+// Default API configuration.
+// Keep these values empty in a public GitHub Pages repository. A real secret should live on a backend, not in frontend code.
+const DEFAULT_CONFIG = {
+  apiKeys: {
+    youtube: "",       // YouTube Data API key
+    twitter: "",       // Twitter/X Bearer Token
+    serpapi: "",       // SerpAPI key
+    producthunt: "",   // Product Hunt Developer Token
+    github: "",        // GitHub Personal Access Token
+    systemeIo: ""      // Systeme.io API key
+  }
+};
+
+let storedApiKeys={};
+try{ storedApiKeys=JSON.parse(localStorage.getItem('leadhunter_keys')||'{}')||{}; }catch{ storedApiKeys={}; }
+const LEGACY_KEY_FIELDS={youtube:'yt',twitter:'tw',serpapi:'serp',producthunt:'ph',github:'gh'};
+function getActiveKey(keyName,defaultConfigKey){
+  const direct=localStorage.getItem(keyName);
+  if(direct) return direct;
+  const legacyField=LEGACY_KEY_FIELDS[defaultConfigKey];
+  if(legacyField&&storedApiKeys[legacyField]) return storedApiKeys[legacyField];
+  return DEFAULT_CONFIG.apiKeys[defaultConfigKey]||'';
+}
+
 const SUBSCRIPTION_CONFIG = { price:49, stripePaymentLink:"", systemeIoLink:"", freeHunts:3, freeSaves:5, proParam:"pro" };
 let allLeads=[], savedLeads=JSON.parse(localStorage.getItem('leadhunter_saved')||'[]'), isHunting=false, huntCount=parseInt(localStorage.getItem('leadhunter_huntCount')||'0');
-let sioConfig=JSON.parse(localStorage.getItem('leadhunter_sio')||'{"apiKey":"","tag":"reddit-lead","webhook":"","auto":"off"}');
-let apiKeys=JSON.parse(localStorage.getItem('leadhunter_keys')||'{"yt":"","tw":"","serp":"","ph":"","gh":""}');
+let storedSio={};
+try{ storedSio=JSON.parse(localStorage.getItem('leadhunter_sio')||'{}')||{}; }catch{ storedSio={}; }
+let sioConfig={...{apiKey:'',tag:'reddit-lead',webhook:'',auto:'off'},...storedSio,apiKey:storedSio.apiKey||getActiveKey('leadhunter_api_systemeIo','systemeIo')};
+let apiKeys={
+  yt:getActiveKey('leadhunter_api_youtube','youtube'),
+  tw:getActiveKey('leadhunter_api_twitter','twitter'),
+  serp:getActiveKey('leadhunter_api_serpapi','serpapi'),
+  ph:getActiveKey('leadhunter_api_producthunt','producthunt'),
+  gh:getActiveKey('leadhunter_api_github','github')
+};
 let siteSettings=JSON.parse(localStorage.getItem('leadhunter_site')||'{"siteName":"LeadHunter Pro","heroTitle":"Hunt buyers on 12 platforms where they ask for what you sell","heroSub":"Reddit, HN, StackOverflow, Dev.to, Hashnode, Lobste.rs, GitHub, YouTube, Twitter, Quora. Enter offer + keywords → finds live posts with buying intent → generates outreach → pushes to Systeme.io. Control everything via Control Panel.","footer":"LeadHunter Pro — 12 APIs","offer":"I sell AI appointment setter for agencies that recovers missed calls with instant SMS and books meetings on autopilot","keywords":"looking for appointment scheduler, need lead gen tool, best CRM for agency, missed call text back, need booking system","price":49,"freeHunts":3,"freeSaves":5}');
 
 const INTENT_PHRASES={looking:['looking for','looking to','searching for','recommend','recommendation','suggest'],help:['need help','help with','how to','struggling','stuck','anyone know'],pain:['tired of','frustrated','alternative to','switch from','vs','not working'],buy:['best','pricing','compare','worth it','which one']};
@@ -402,7 +434,12 @@ async function searchIndieHackers(keywords){
 }
 
 // Systeme.io
-function saveSioConfig(){ sioConfig={apiKey:document.getElementById('sioApiKey')?.value.trim()||document.getElementById('ctrl-sioApiKey')?.value.trim()||'',tag:document.getElementById('sioTag')?.value.trim()||document.getElementById('ctrl-sioTag')?.value.trim()||'reddit-lead',webhook:document.getElementById('sioWebhook')?.value.trim()||document.getElementById('ctrl-sioWebhook')?.value.trim()||'',auto:document.getElementById('sioAuto')?.value||document.getElementById('ctrl-sioAuto')?.value||'off'}; localStorage.setItem('leadhunter_sio',JSON.stringify(sioConfig)); updateSioStatus(); showToast('Systeme.io saved'); }
+function saveSioConfig(){
+  sioConfig={apiKey:document.getElementById('sioApiKey')?.value.trim()||document.getElementById('ctrl-sioApiKey')?.value.trim()||'',tag:document.getElementById('sioTag')?.value.trim()||document.getElementById('ctrl-sioTag')?.value.trim()||'reddit-lead',webhook:document.getElementById('sioWebhook')?.value.trim()||document.getElementById('ctrl-sioWebhook')?.value.trim()||'',auto:document.getElementById('sioAuto')?.value||document.getElementById('ctrl-sioAuto')?.value||'off'};
+  localStorage.setItem('leadhunter_sio',JSON.stringify(sioConfig));
+  localStorage.setItem('leadhunter_api_systemeIo',sioConfig.apiKey);
+  updateSioStatus(); showToast('Systeme.io saved');
+}
 function updateSioStatus(){ const el=document.getElementById('sioStatus'), el2=document.getElementById('ctrl-sioStatus'); [el,el2].forEach(e=>{ if(!e) return; if(sioConfig.apiKey||sioConfig.webhook){ e.textContent=sioConfig.apiKey?'✅ API connected':'✅ Webhook connected'; e.className='text-[11px] px-3 py-2 rounded-full bg-emerald-500/15 border border-emerald-500/20 text-emerald-400'; } else { e.textContent='Not connected'; e.className='text-[11px] px-3 py-2 rounded-full bg-white/[0.06] border border-white/[0.08] text-zinc-400'; } }); }
 async function pushToSystemeIo(lead){ if(!sioConfig.apiKey&&!sioConfig.webhook){ showToast('Connect Systeme.io first'); return {success:false}; } const outreach=generateOutreach(lead,document.getElementById('offerInput').value); const payload={email:`${lead.author}@reddit.lead`.replace(/[^a-zA-Z0-9@._-]/g,''),firstName:lead.author||'Lead',source:'LeadHunter Pro',reddit_post:lead.title,subreddit:lead.subreddit,post_url:lead.url,intent_score:lead.intent.score,platform:lead.source,tag:sioConfig.tag}; let result={success:false}; if(sioConfig.webhook){ try{ const res=await fetch(sioConfig.webhook,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); if(res.ok) result.success=true; }catch(e){ result.webhookError=e.message; } } if(sioConfig.apiKey){ try{ const res=await fetch('https://api.systeme.io/api/contacts',{method:'POST',headers:{'Content-Type':'application/json','X-API-Key':sioConfig.apiKey},body:JSON.stringify({email:payload.email,firstName:payload.firstName,fields:[{slug:'reddit_post',value:payload.reddit_post?.slice(0,255)},{slug:'post_url',value:payload.post_url}],tags:[{name:sioConfig.tag}]})}); if(res.ok) result.success=true; }catch(e){ result.apiError=e.message; } } return result; }
 
@@ -621,7 +658,12 @@ document.getElementById('savePricingCtrl')?.addEventListener('click',()=>{
 });
 document.getElementById('unlockProBtn')?.addEventListener('click',()=>{ unlockPro(); });
 document.getElementById('resetFreeBtn')?.addEventListener('click',()=>{ localStorage.setItem('leadhunter_huntCount','0'); huntCount=0; updateFreeBadges(); showToast('Free counter reset'); });
-document.getElementById('ctrl-saveKeys')?.addEventListener('click',()=>{ apiKeys={yt:document.getElementById('ctrl-ytKey').value,tw:document.getElementById('ctrl-twKey').value,serp:document.getElementById('ctrl-serpKey').value,ph:document.getElementById('ctrl-phKey').value,gh:document.getElementById('ctrl-ghKey').value}; localStorage.setItem('leadhunter_keys',JSON.stringify(apiKeys)); showToast('API keys saved'); });
+document.getElementById('ctrl-saveKeys')?.addEventListener('click',()=>{
+  apiKeys={yt:document.getElementById('ctrl-ytKey')?.value.trim()||'',tw:document.getElementById('ctrl-twKey')?.value.trim()||'',serp:document.getElementById('ctrl-serpKey')?.value.trim()||'',ph:document.getElementById('ctrl-phKey')?.value.trim()||'',gh:document.getElementById('ctrl-ghKey')?.value.trim()||''};
+  localStorage.setItem('leadhunter_keys',JSON.stringify(apiKeys));
+  localStorage.setItem('leadhunter_api_youtube',apiKeys.yt); localStorage.setItem('leadhunter_api_twitter',apiKeys.tw); localStorage.setItem('leadhunter_api_serpapi',apiKeys.serp); localStorage.setItem('leadhunter_api_producthunt',apiKeys.ph); localStorage.setItem('leadhunter_api_github',apiKeys.gh);
+  showToast('API keys saved — UI values override defaults');
+});
 document.getElementById('ctrl-sioSave')?.addEventListener('click',saveSioConfig);
 document.getElementById('ctrl-sioTest')?.addEventListener('click',async()=>{ saveSioConfig(); showToast('Testing...'); const test={id:'test',title:'Test',snippet:'Test',url:location.href,author:'test',subreddit:'test',score:10,num_comments:1,created_utc:Date.now()/1000,intent:{score:85,level:'high'},matched:['test']}; const r=await pushToSystemeIo(test); if(r.success) showToast('✅ Systeme.io OK'); else showToast('❌ Failed'); });
 document.getElementById('ctrl-generateAccount')?.addEventListener('click',generateCustomerAccount);
@@ -668,15 +710,14 @@ function updateDashboard(){
   fill('ctrl-siteName',siteSettings.siteName); fill('ctrl-heroTitle',siteSettings.heroTitle); fill('ctrl-heroSub',siteSettings.heroSub); fill('ctrl-footer',siteSettings.footer);
   fill('ctrl-price',siteSettings.price); fill('ctrl-freeHunts',siteSettings.freeHunts); fill('ctrl-freeSaves',siteSettings.freeSaves); fill('ctrl-stripeLink',siteSettings.stripeLink); fill('ctrl-sioLink',siteSettings.sioLink);
   fill('offerInput',siteSettings.offer); fill('keywordsInput',siteSettings.keywords); fill('subredditsInput',siteSettings.subreddits); fill('timeInput',siteSettings.time);
-  const keys=JSON.parse(localStorage.getItem('leadhunter_keys')||'{}');
-  fill('ytKey',keys.yt); fill('twKey',keys.tw); fill('serpKey',keys.serp); fill('phKey',keys.ph); fill('ghKey',keys.gh);
-  fill('ctrl-ytKey',keys.yt); fill('ctrl-twKey',keys.tw); fill('ctrl-serpKey',keys.serp); fill('ctrl-phKey',keys.ph); fill('ctrl-ghKey',keys.gh);
-  const sio=JSON.parse(localStorage.getItem('leadhunter_sio')||'{}');
-  fill('sioApiKey',sio.apiKey); fill('sioTag',sio.tag); fill('sioWebhook',sio.webhook);
-  fill('ctrl-sioApiKey',sio.apiKey); fill('ctrl-sioTag',sio.tag); fill('ctrl-sioWebhook',sio.webhook);
-  if(sio.auto){ const el=document.getElementById('sioAuto'); if(el) el.value=sio.auto; const el2=document.getElementById('ctrl-sioAuto'); if(el2) el2.value=sio.auto; }
+  // Pre-fill the APIs & Systeme.io panel with the active values.
+  fill('ytKey',apiKeys.yt); fill('twKey',apiKeys.tw); fill('serpKey',apiKeys.serp); fill('phKey',apiKeys.ph); fill('ghKey',apiKeys.gh);
+  fill('ctrl-ytKey',apiKeys.yt); fill('ctrl-twKey',apiKeys.tw); fill('ctrl-serpKey',apiKeys.serp); fill('ctrl-phKey',apiKeys.ph); fill('ctrl-ghKey',apiKeys.gh);
+  fill('sioApiKey',sioConfig.apiKey); fill('sioTag',sioConfig.tag); fill('sioWebhook',sioConfig.webhook);
+  fill('ctrl-sioApiKey',sioConfig.apiKey); fill('ctrl-sioTag',sioConfig.tag); fill('ctrl-sioWebhook',sioConfig.webhook);
+  if(sioConfig.auto){ const el=document.getElementById('sioAuto'); if(el) el.value=sioConfig.auto; const el2=document.getElementById('ctrl-sioAuto'); if(el2) el2.value=sioConfig.auto; }
 })();
 window.copyOutreach=copyOutreach; window.regenOutreach=regenOutreach; window.toggleSave=toggleSave; window.manualPushToSio=manualPushToSio; window.loadDemo=loadDemo;
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3d7aa53c982fba2',t:'MTc4OTgxMTIwOA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3df696ced08f5b8',t:'MTc4OTg5MjQzNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
