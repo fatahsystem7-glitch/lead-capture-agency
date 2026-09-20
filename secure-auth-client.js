@@ -68,5 +68,10 @@
     const d=await r.json();if(!r.ok)throw new Error(d.error||'Support draft request failed');return d.draft||null;
   }
   window.LEADHUNTER_AUTH={client,session:null,checkPaidAccess,saveSupportSettings,saveOpenRouterKey,requestSupportDraft};
-  document.addEventListener('DOMContentLoaded',async()=>{injectCss();await checkPaidAccess();if(client)client.auth.onAuthStateChange(()=>setTimeout(checkPaidAccess,0));});
+  document.addEventListener('DOMContentLoaded',async()=>{
+    injectCss();
+    document.getElementById('logoutBtn')?.addEventListener('click',async()=>{if(client) await client.auth.signOut();});
+    await checkPaidAccess();
+    if(client)client.auth.onAuthStateChange(()=>setTimeout(checkPaidAccess,0));
+  });
 })();
